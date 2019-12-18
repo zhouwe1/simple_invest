@@ -1,0 +1,4 @@
+flask
+flask-alembic
+flask-sqlalchemy
+pymysql
