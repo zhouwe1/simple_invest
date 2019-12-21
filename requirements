@@ -1,4 +1,5 @@
-flask
-flask-alembic
-flask-sqlalchemy
-pymysql
+Flask
+Flask-Alembic
+Flask-SQLAlchemy
+PyMySQL
+Flask-Login
