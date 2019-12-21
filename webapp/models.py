@@ -1,14 +1,16 @@
 from .extentions import db
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
+from .functions import public
 
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer(), primary_key=True)
     username = db.Column(db.String(20), unique=True)
     password = db.Column(db.String(200))
+    email = db.Column(db.String(32), unique=True)
 
-    def __init__(self, username, password):
+    def __init__(self, username, password, email):
         """
         创建用户
         :param username:
@@ -16,6 +18,7 @@ class User(db.Model, UserMixin):
         """
         self.username = username
         self.password = generate_password_hash(password)
+        self.email = email
         db.session.add(self)
         db.session.commit()
 
@@ -26,3 +29,7 @@ class User(db.Model, UserMixin):
         :return: True or False
         """
         return check_password_hash(self.password, password)
+
+    @property
+    def avatar(self):
+        return public.get_avatar()

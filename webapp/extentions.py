@@ -8,7 +8,7 @@ alembic = Alembic()
 
 login_manager = LoginManager()
 login_manager.login_view = 'home.login'
-login_manager.session_protection = 'strong'
+login_manager.session_protection = 'basic'
 login_manager.login_message = '请登录'
 login_manager.login_message_category = 'info'
 
@@ -17,5 +17,3 @@ login_manager.login_message_category = 'info'
 def load_user(user_id):
     from webapp.models import User
     return User.query.get(user_id)
-
-

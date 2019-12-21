@@ -89,13 +89,13 @@
     <!-- Notifications Dropdown Menu -->
     <li class="nav-item dropdown user-menu">
         <a href="#" class="nav-link" data-toggle="dropdown">
-            <img alt src="{{ url_for('static', filename='img/user2-160x160.jpg') }}" class="user-image img-circle elevation-2">
+            <img alt src="{{ session.avatar }}" class="user-image img-circle elevation-2">
             <span class="d-none d-md-inline">{{ current_user.username }}</span>
         </a>
         <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
             <!-- User image -->
             <li class="user-header bg-default">
-                <img src="{{ url_for('static', filename='img/user2-160x160.jpg') }}" class="img-circle elevation-2" alt="User Image">
+                <img src="{{ session.avatar }}" class="img-circle elevation-2" alt="User Image">
                 <p>
                     Alexander Pierce - Web Developer
                     <small>Member since Nov. 2012</small>
