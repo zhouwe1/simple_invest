@@ -21,7 +21,7 @@ def login():
             login_user(user)
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
-            return redirect(url_for('invest.home'))
+            return redirect(url_for('home.dashboard'))
         else:
             pass
 
@@ -42,7 +42,7 @@ def register():
                 login_user(user)
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
-            return redirect(url_for('invest.home'))
+            return redirect(url_for('home.dashboard'))
         else:
             pass
 
@@ -54,3 +54,9 @@ def register():
 def logout():
     logout_user()
     return redirect(url_for('home.login'))
+
+
+@home_blueprint.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('home/dashboard.html')

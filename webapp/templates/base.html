@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<!--
+This is a starter template page. Use this page to start your new project from
+scratch. This page gets rid of all links and provides the needed markup only.
+-->
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Financing - Loadmemory</title>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <!-- Font Awesome -->
+    <link href="https://cdn.bootcss.com/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
+    <!-- Theme style -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/adminlte.min.css') }}">
+    <!-- Google Font: Source Sans Pro -->
+    <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
+</head>
+
+<body class="hold-transition sidebar-mini pace-primary">
+<div class="wrapper">
+    <!-- Main Header -->
+
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        {% include 'header.html' %}
+    </nav>
+
+    <!-- Left side column. contains the logo and sidebar -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        {% include 'sidebar.html' %}
+    </aside>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>{% block content_header %}{% endblock %}</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item active">Contacts</li>
+                        </ol>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            {% block content %}
+            {% endblock %}
+        </section><!-- /.content -->
+
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <footer class="main-footer">
+        {% include 'footer.html' %}
+    </footer>
+
+</div><!-- ./wrapper -->
+
+
+<!-- jQuery -->
+<script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="{{ url_for('static', filename='js/adminlte.min.js') }}"></script>
+{% block footer_script %}
+{% endblock %}
+</body>
+</html>

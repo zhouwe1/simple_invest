@@ -3,13 +3,13 @@ from flask_login import current_user, login_required
 from webapp.models import User
 
 
-invest_blueprint = Blueprint(
-    'invest',
+financing_blueprint = Blueprint(
+    'financing',
     __name__
 )
 
 
-@invest_blueprint.route('/')
+@financing_blueprint.route('/')
 @login_required
 def home():
     return render_template('user.html')
