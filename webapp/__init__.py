@@ -12,6 +12,8 @@ login_manager.init_app(flask_app)
 
 from .controllers.home import home_blueprint
 from .controllers.user import user_blueprint
+from .controllers.invest import invest_blueprint
 
 flask_app.register_blueprint(home_blueprint, url_prefix='')
 flask_app.register_blueprint(user_blueprint, url_prefix='/user')
+flask_app.register_blueprint(invest_blueprint, url_prefix='/invest')

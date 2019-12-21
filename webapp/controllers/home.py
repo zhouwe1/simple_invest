@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session, abort, flash
-from flask_login import login_user, logout_user, current_user, login_required
+from flask import Blueprint, render_template, request, redirect, url_for
+from flask_login import login_user, logout_user, login_required
 from webapp.models import User
 
 
@@ -13,24 +13,40 @@ home_blueprint = Blueprint(
 def login():
 
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
+        username = request.form.get('username')
+        password = request.form.get('password')
 
         user = User.query.filter_by(username=username).first()
         if user.check_password(password):
-            if user.totp_key:
-                # 进行二次验证
-                session['login_user_2step'] = user.id
-                return redirect(url_for('user.two_step', next=request.args.get('next')))
-
             login_user(user)
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
-            return redirect(url_for('pic.home'))
+            return redirect(url_for('invest.home'))
         else:
             pass
 
-    return render_template('login.html')
+    return render_template('home/login.html')
+
+
+@home_blueprint.route('/register', methods=['POST', 'GET'])
+def register():
+
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        re_password = request.form.get('re_password')
+
+        if not User.query.filter_by(username=username).count():
+            if password == re_password:
+                user = User(username, password)
+                login_user(user)
+            if request.args.get('next'):
+                return redirect(request.args.get('next'))
+            return redirect(url_for('invest.home'))
+        else:
+            pass
+
+    return render_template('home/register.html')
 
 
 @home_blueprint.route('/logout')
