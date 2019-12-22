@@ -25,6 +25,7 @@ def login():
         user = User.query.filter_by(username=username).first()
         if user.check_password(password):
             login_user(user, remember)
+            user.refresh_last_login()
             if request.args.get('next'):
                 return redirect(request.args.get('next'))
             return redirect(url_for('home.dashboard'))
@@ -48,6 +49,7 @@ def register():
                 if password == re_password:
                     user = User(username, password, email)
                     login_user(user)
+                    user.refresh_last_login()
                     session['avatar'] = user.avatar
                     if request.args.get('next'):
                         return redirect(request.args.get('next'))

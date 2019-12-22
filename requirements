@@ -3,3 +3,4 @@ Flask-Alembic
 Flask-SQLAlchemy
 PyMySQL
 Flask-Login
+pytz

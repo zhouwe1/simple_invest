@@ -9,6 +9,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), unique=True)
     password = db.Column(db.String(200))
     email = db.Column(db.String(32), unique=True)
+    last_login = db.Column(db.DateTime(timezone=True))
 
     def __init__(self, username, password, email):
         """
@@ -33,3 +34,7 @@ class User(db.Model, UserMixin):
     @property
     def avatar(self):
         return public.get_avatar()
+
+    def refresh_last_login(self):
+        self.last_login = public.now()
+        db.session.commit()
