@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from flask_login import login_user, logout_user, login_required
-from webapp.models import User
+from webapp.models.user_models import User
 
 
 home_blueprint = Blueprint(
