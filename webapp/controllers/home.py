@@ -74,7 +74,7 @@ def logout():
     return redirect(url_for('home.login'))
 
 
-@home_blueprint.route('/dashboard')
+@home_blueprint.route('/')
 @login_required
 def dashboard():
     return render_template('home/dashboard.html')
