@@ -10,6 +10,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(200))
     email = db.Column(db.String(32), unique=True)
     last_login = db.Column(db.DateTime(timezone=True))
+    join_date = db.Column(db.DateTime(timezone=True), default=public.now)
 
     def __init__(self, username, password, email):
         """

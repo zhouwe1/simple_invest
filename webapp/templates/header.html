@@ -97,8 +97,8 @@
             <li class="user-header bg-default">
                 <img src="{{ session.avatar }}" class="img-circle elevation-2" alt="User Image">
                 <p>
-                    Alexander Pierce - Web Developer
-                    <small>Member since Nov. 2012</small>
+                    {{ current_user.username }}
+                    <small>Member since {{ current_user.join_date }}</small>
                 </p>
             </li>
             <!-- Menu Body -->
