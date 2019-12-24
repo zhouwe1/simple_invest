@@ -22,5 +22,5 @@ flask_app.register_blueprint(financing_blueprint, url_prefix='/invest')
 
 @flask_app.before_request
 def load_avatar():
-    if 'avatar' not in session:
+    if 'user_id' in session and 'avatar' not in session:
         session['avatar'] = current_user.avatar
