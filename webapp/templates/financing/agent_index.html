@@ -162,6 +162,7 @@ function agentUpdate(tr) {
                 name_input.val(old_name);
                 submit_btn.text('提交');
                 submit_btn.removeAttr('disabled');
+                $.growl.error({title: '发生错误', message: r['msg'], location:"tr"});
             }
         }
     })

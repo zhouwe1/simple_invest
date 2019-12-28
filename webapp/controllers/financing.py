@@ -36,7 +36,7 @@ def agent_update():
     name = form.get('name')
 
     if Agent.query.filter(Agent.name == name, Agent.id != agent_id).count():
-        return jsonify({'code': 1, 'msg': '名称重复，请更换其他名称'})
+        return jsonify({'code': 1, 'msg': '名称重复'})
     if agent_id == '0':
         agent = Agent(name=name)
     else:
