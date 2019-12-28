@@ -150,7 +150,7 @@ function agentUpdate(tr) {
                 tr.addClass('tr-success');
                 setInterval(function () {
                     tr.removeClass('tr-success')
-                }, 2000);
+                }, 1000);
                 update_btn.removeAttr('disabled');
                 update_btn.text('修改');
                 update_btn.addClass('btn-default');
@@ -168,7 +168,7 @@ function agentUpdate(tr) {
                 tr.addClass('tr-error');
                 setInterval(function () {
                     tr.removeClass('tr-error')
-                }, 2000);
+                }, 1000);
                 name_input.val(old_name);
                 submit_btn.text('提交');
                 submit_btn.removeAttr('disabled');
