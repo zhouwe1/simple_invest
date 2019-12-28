@@ -15,6 +15,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link href="https://cdn.bootcss.com/font-awesome/5.11.2/css/all.min.css" rel="stylesheet">
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/adminlte.min.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- Google Font: Source Sans Pro -->
     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700" rel="stylesheet">
 </head>
@@ -72,8 +73,20 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.min.js"></script>
 <!-- Bootstrap 4 -->
 <script src="https://cdn.bootcss.com/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+<!-- Bootbox -->
+<script src="https://cdn.bootcss.com/bootbox.js/5.3.2/bootbox.min.js"></script>
 <!-- AdminLTE App -->
 <script src="{{ url_for('static', filename='js/adminlte.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/tools.js') }}"></script>
+<script type="text/javascript">
+    let current_path = window.location.pathname;
+    $('.nav-sidebar a').each(function () {
+        if(current_path==$(this).attr('href')){
+            $(this).parents('li').children('a').addClass('active');
+            $(this).parents('li.has-treeview').addClass('menu-open')
+        }
+    });
+</script>
 {% block footer_script %}
 {% endblock %}
 </body>

@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block content_header %}
+    理财产品配置
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header border-0">
+        <h3 class="card-title"></h3>
+        <div class="card-tools">
+            <button type="button" class="btn btn-success btn-md tr-add">Add</button>
+        </div>
+    </div>
+    <div class="card-body table-responsive p-0">
+        <table class="table table-valign-middle">
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>名称</th>
+                <th>类型</th>
+                <th>代码</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="dataTbody">
+            {% for fp in fps %}
+                <tr>
+                    <td>{{ fp.id }}</td>
+                    <td>{{ fp.name }}</td>
+                    <td>{{ fp.type }}</td>
+                    <td>{{ fp.code }}</td>
+                    <td>
+                        <button type="button" class="btn btn-success tr-submit">保存</button>
+                        <button type="button" class="btn btn-danger tr-delete">删除</button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+            <tbody id="cloneTbody" class="d-none">
+                <tr class="clone-tr">
+                    <td></td>
+                    <td>
+                        <input type="text" class="form-control" maxlength="32" placeholder="请输入名称">
+                    </td>
+                    <td>
+                        <div class="form-inline">
+                            <select class="form-control">
+                                <option>基金</option>
+                                <option>股票</option>
+                                <option>银行理财</option>
+                                <option>保险理财</option>
+                            </select>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="form-inline">
+                            <input type="text" class="form-control" maxlength="6" size="5" placeholder="基金/股票 代码">
+                        </div>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-success tr-submit">保存</button>
+                        <button type="button" class="btn btn-danger tr-delete">删除</button>
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block footer_script %}
+<script type="text/javascript">
+$(function () {
+
+})
+</script>
+{% endblock %}

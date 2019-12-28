@@ -26,6 +26,11 @@ class Agent(db.Model):
         lazy='dynamic'
     )
 
+    def __init__(self, name):
+        self.name = name
+        db.session.add(self)
+        db.session.commit()
+
 
 fp_assets = db.Table(
     'fp_assets',
@@ -38,8 +43,8 @@ fp_assets = db.Table(
 class FinancialProduct(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(32), unique=True)
-    fund_code = db.Column(db.Integer(), unique=True)  # 基金代码
-    stock_code = db.Column(db.Integer(), unique=True)  # 基金代码
+    code = db.Column(db.Integer(), unique=True)  # 基金/股票 代码
+    type = db.Column(db.SmallInteger())  # 类型 基金/股票/银行理财/其他理财
     url = db.Column(db.Text(), default='{}')
     meta = db.Column(db.Text(), default='{}')
     update_time = db.Column(db.DateTime(timezone=True))  # 更新时间
