@@ -17,7 +17,6 @@
         <table class="table table-valign-middle">
             <thead>
             <tr>
-                <th>ID</th>
                 <th>名称</th>
                 <th>类型</th>
                 <th>代码</th>
@@ -27,7 +26,6 @@
             <tbody id="dataTbody">
             {% for fp in fps %}
                 <tr>
-                    <td>{{ fp.id }}</td>
                     <td>{{ fp.name }}</td>
                     <td>{{ fp.type }}</td>
                     <td>{{ fp.code }}</td>
@@ -40,7 +38,6 @@
             </tbody>
             <tbody id="cloneTbody" class="d-none">
                 <tr class="clone-tr">
-                    <td></td>
                     <td>
                         <input type="text" class="form-control" maxlength="32" placeholder="请输入名称">
                     </td>

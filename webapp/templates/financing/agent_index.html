@@ -16,7 +16,6 @@
         <table class="table  table-valign-middle">
             <thead>
                 <tr>
-                    <th width="20%">ID</th>
                     <th width="50%">名称</th>
                     <th width="30%">操作</th>
                 </tr>
@@ -24,19 +23,18 @@
             <tbody id="dataTbody">
             {% for agent in agents %}
                 <tr data-id="{{ agent.id }}">
-                    <td class="td-id">{{ agent.id }}</td>
                     <td class="td-name" data-name="{{ agent.name }}">{{ agent.name }}</td>
                     <td>
                         <button type="button" class="btn btn-default tr-update">修改</button>
                         <button type="button" class="btn btn-success tr-submit d-none">保存</button>
                         <button type="button" class="btn btn-danger tr-delete">删除</button>
+                        <button type="button" class="btn btn-warning tr-cancel d-none">取消</button>
                     </td>
                 </tr>
             {% endfor %}
             </tbody>
             <tbody id="cloneTbody" class="d-none">
                 <tr class="clone-tr" data-id="0">
-                    <td class="td-id"></td>
                     <td class="td-name" data-name="">
                         <div class="form-inline">
                             <input type="text" name="name" maxlength="16" class="form-control" placeholder="请输入名称" autocomplete="off">
@@ -46,6 +44,7 @@
                         <button type="button" class="btn btn-default tr-update d-none">修改</button>
                         <button type="button" class="btn btn-success tr-submit">保存</button>
                         <button type="button" class="btn btn-danger tr-delete">删除</button>
+                        <button type="button" class="btn btn-warning tr-cancel d-none">取消</button>
                     </td>
                 </tr>
             </tbody>
@@ -65,6 +64,8 @@ $(function () {
             name_td = tr.find('.td-name'),
             name = name_td.attr('data-name');
         $(this).addClass('d-none');  //隐藏修改按钮
+        tr.find('.tr-delete').addClass('d-none');  //隐藏删除按钮
+        tr.find('.tr-cancel').removeClass('d-none');  //显示保存按钮
         tr.find('.tr-submit').removeClass('d-none');  //显示保存按钮
         name_td.html('<div class="form-inline"><input type="text" name="name" maxlength="16" class="form-control"' +
             ' value="' + name + '" placeholder="请输入名称" autocomplete="off"></div>')
@@ -74,6 +75,16 @@ $(function () {
         let tr = $(this).parents('tr'),
             id = tr.attr('data-id');
         agentUpdate(tr, id)
+    });
+
+    dataTbody.on('click', '.tr-cancel', function () {
+        let tr =$(this).parents('tr'),
+            name = tr.children('.td-name').attr('data-name');
+        tr.children('.td-name').text(name);
+        $(this).addClass('d-none');
+        tr.find('.tr-submit').addClass('d-none');
+        tr.find('.tr-update').removeClass('d-none');
+        tr.find('.tr-delete').removeClass('d-none');
     });
 
     dataTbody.on('click', '.tr-delete', function () {
@@ -96,7 +107,7 @@ $(function () {
                                 tr.addClass('tr-danger');
                                 setInterval(function () {
                                 tr.remove();
-                                }, 2000);
+                                }, 500);
                             }
                         }
 
@@ -145,7 +156,6 @@ function agentUpdate(tr) {
                 update_btn.addClass('btn-default');
                 update_btn.removeClass('btn-success');
                 tr.attr('data-id', r['id']);
-                tr.children('.td-id').text(r['id']);
                 tr.children('.td-name').text(r['name']);
                 tr.children('.td-name').attr('data-name', r['name']);
                 tr.removeClass('clone-tr');
