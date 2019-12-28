@@ -74,10 +74,12 @@ def fp_update():
     name = form.get('name')
     fp_type = form.get('fp_type')
     fp_code = form.get('fp_code') or None
-    print(form)
-    time.sleep(3)
+
     if FinancialProduct.query.filter(FinancialProduct.name == name, FinancialProduct.id != fp_id).count():
         return jsonify({'code': 1, 'msg': '名称重复'})
+    if fp_code:
+        if FinancialProduct.query.filter(FinancialProduct.code == fp_code, FinancialProduct.id != fp_id).count():
+            return jsonify({'code': 1, 'msg': '代码重复'})
     if fp_id == '0':
         fp = FinancialProduct(name=name, code=fp_code, type_id=fp_type)
     else:
