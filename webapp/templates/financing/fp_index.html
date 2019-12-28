@@ -162,7 +162,14 @@ function ftUpdate(tr) {
     }
 
     if(new_type == 3 || new_type == 4){
-        if (!new_code){$.growl.error({title: '发生错误', message: '股票或基金请填写代码', location:"tr"}); return false}
+        if (!new_code){
+            tr.addClass('tr-error');
+            setInterval(function () {
+                tr.removeClass('tr-error')
+            }, 1000);
+            $.growl.error({title: '发生错误', message: '股票或基金请填写代码', location:"tr"});
+            return false
+        }
     }
 
     submit_btn.html('<i class="fa fa-spinner fa-pulse"></>');  //把保存按钮改成loading图标
