@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session, abort, flash
 from flask_login import current_user, login_required
 from sqlalchemy.sql import desc
-from webapp.models.financing_models import Agent, FinancialProduct, UserAsset
+from webapp.models.financing_models import Agent, FinancialProduct, UserAsset, FPType
 from webapp.extentions import db
 import time
 
@@ -34,7 +34,7 @@ def agent_update():
     form = request.form
     agent_id = form.get('id')
     name = form.get('name')
-
+    time.sleep(3)
     if Agent.query.filter(Agent.name == name, Agent.id != agent_id).count():
         return jsonify({'code': 1, 'msg': '名称重复'})
     if agent_id == '0':
@@ -58,8 +58,39 @@ def agent_delete():
 @financing_blueprint.route('/financial_product')
 @login_required
 def fp_index():
-    fps = FinancialProduct.query.order_by('id').all()
+    fps = FinancialProduct.query.order_by(desc('id')).all()
     return render_template(
         'financing/fp_index.html',
         fps=fps,
+        fp_types=FPType.query.order_by('id').all(),
     )
+
+
+@financing_blueprint.route('/fp_update', methods=['POST'])
+@login_required
+def fp_update():
+    form = request.form
+    fp_id = form.get('id')
+    name = form.get('name')
+    fp_type = form.get('fp_type')
+    fp_code = form.get('fp_code') or None
+    print(form)
+    time.sleep(3)
+    if FinancialProduct.query.filter(FinancialProduct.name == name, FinancialProduct.id != fp_id).count():
+        return jsonify({'code': 1, 'msg': '名称重复'})
+    if fp_id == '0':
+        fp = FinancialProduct(name=name, code=fp_code, type_id=fp_type)
+    else:
+        fp = FinancialProduct.query.filter_by(id=fp_id).first()
+        fp.name = name
+        db.session.commit()
+    return jsonify({'code': 0, 'name': fp.name, 'id': fp.id, 'fp_type': fp.type.name, 'fp_code': fp.code})
+
+
+@financing_blueprint.route('/fp_delete')
+@login_required
+def fp_delete():
+    fp = FinancialProduct.query.filter_by(id=request.args.get('id')).first()
+    db.session.delete(fp)
+    db.session.commit()
+    return jsonify({'code': 0})

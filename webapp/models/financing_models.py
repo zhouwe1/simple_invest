@@ -44,7 +44,7 @@ class FinancialProduct(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(32), unique=True)
     code = db.Column(db.Integer(), unique=True)  # 基金/股票 代码
-    type = db.Column(db.Integer(), db.ForeignKey('fp_type.id', ondelete='RESTRICT'))
+    type_id = db.Column(db.Integer(), db.ForeignKey('fp_type.id', ondelete='RESTRICT'))
     url = db.Column(db.Text(), default='{}')
     meta = db.Column(db.Text(), default='{}')
     update_time = db.Column(db.DateTime(timezone=True))  # 更新时间
@@ -53,6 +53,13 @@ class FinancialProduct(db.Model):
         secondary=fp_assets,
         backref=db.backref('fps', lazy='dynamic')
     )
+
+    def __init__(self, name, type_id, code=None):
+        self.name = name
+        self.type_id = type_id
+        self.code = code
+        db.session.add(self)
+        db.session.commit()
 
 
 class FPAsset(db.Model):
@@ -70,3 +77,8 @@ class FPType(db.Model):
     """
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(8), unique=True)
+    fps = db.relationship(
+        'FinancialProduct',
+        backref='type',
+        lazy='dynamic'
+    )

@@ -17,48 +17,51 @@
         <table class="table table-valign-middle">
             <thead>
             <tr>
-                <th>名称</th>
-                <th>类型</th>
-                <th>代码</th>
-                <th>操作</th>
+                <th width="40%">名称</th>
+                <th width="20%">类型</th>
+                <th width="10%">代码</th>
+                <th width="30%">操作</th>
             </tr>
             </thead>
             <tbody id="dataTbody">
             {% for fp in fps %}
-                <tr>
-                    <td>{{ fp.name }}</td>
-                    <td>{{ fp.type }}</td>
-                    <td>{{ fp.code }}</td>
+                <tr data-id="{{ fp.id }}" data-name="{{ fp.name }}" data-type="" data-code="{{ fp.code }}">
+                    <td class="td-name">{{ fp.name }}</td>
+                    <td>{{ fp.type.name }}</td>
+                    <td>{{ fp.code|default('', True) }}</td>
                     <td>
-                        <button type="button" class="btn btn-success tr-submit">保存</button>
+                        <button type="button" class="btn btn-default tr-update">修改</button>
+                        <button type="button" class="btn btn-success tr-submit d-none">保存</button>
                         <button type="button" class="btn btn-danger tr-delete">删除</button>
+                        <button type="button" class="btn btn-warning tr-cancel d-none">取消</button>
                     </td>
                 </tr>
             {% endfor %}
             </tbody>
             <tbody id="cloneTbody" class="d-none">
-                <tr class="clone-tr">
-                    <td>
-                        <input type="text" class="form-control" maxlength="32" placeholder="请输入名称">
+                <tr class="clone-tr" data-id="0" data-name="" data-type="" data-code="">
+                    <td class="td-name">
+                        <input type="text" name="name" class="form-control" maxlength="32" placeholder="请输入名称" autocomplete="off">
                     </td>
-                    <td>
+                    <td class="td-type">
                         <div class="form-inline">
-                            <select class="form-control">
-                                <option>基金</option>
-                                <option>股票</option>
-                                <option>银行理财</option>
-                                <option>保险理财</option>
+                            <select class="form-control" name="type">
+                                {% for fpt in fp_types %}
+                                <option value="{{ fpt.id }}">{{ fpt.name }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </td>
-                    <td>
+                    <td class="td-code">
                         <div class="form-inline">
-                            <input type="text" class="form-control" maxlength="6" size="5" placeholder="基金/股票 代码">
+                            <input type="text" name="code" class="form-control" maxlength="6" size="5" placeholder="基金/股票" autocomplete="off">
                         </div>
                     </td>
                     <td>
+                        <button type="button" class="btn btn-default tr-update d-none">修改</button>
                         <button type="button" class="btn btn-success tr-submit">保存</button>
                         <button type="button" class="btn btn-danger tr-delete">删除</button>
+                        <button type="button" class="btn btn-warning tr-cancel d-none">取消</button>
                     </td>
 
                 </tr>
@@ -73,7 +76,120 @@
 {% block footer_script %}
 <script type="text/javascript">
 $(function () {
+    let dataTbody = $('#dataTbody');
 
-})
+    dataTbody.on('click', '.tr-submit', function () {
+        let tr = $(this).parents('tr');
+        ftUpdate(tr)
+    });
+
+    dataTbody.on('click', '.tr-update', function(){
+        let tr = $(this).parents('tr'),
+            name_td = tr.find('.td-name'),
+            name = tr.attr('data-name');
+        name_td.html('<input type="text" name="name" maxlength="32" class="form-control"' +
+            ' value="' + name + '" placeholder="请输入名称" autocomplete="off">');
+        tr.find('.tr-update').addClass('d-none');
+        tr.find('.tr-submit').removeClass('d-none');
+        tr.find('.tr-delete').addClass('d-none');
+        tr.find('.tr-cancel').removeClass('d-none');
+    });
+
+    dataTbody.on('click', '.tr-cancel', function(){
+        let tr = $(this).parents('tr'),
+            name_td = tr.find('.td-name'),
+            name = tr.attr('data-name');
+        name_td.text(name);
+        tr.find('.tr-update').removeClass('d-none');
+        tr.find('.tr-submit').addClass('d-none');
+        tr.find('.tr-delete').removeClass('d-none');
+        tr.find('.tr-cancel').addClass('d-none');
+    });
+
+    dataTbody.on('click', '.tr-delete', function () {
+        let tr =$(this).parents('tr'),
+            id = tr.attr('data-id');
+        if(tr.hasClass('clone-tr')){tr.remove()}
+        else{
+            bootbox.confirm('确认删除吗？', function (result) {
+                if(result){
+                    tr.find('.tr-delete').attr('disabled', 'disabled');
+                    tr.find('.tr-delete').html('<i class="fa fa-spinner fa-pulse"></>');
+
+                    $.ajax({
+                        url: '{{ url_for('financing.fp_delete') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {'id': id},
+                        success: function (r) {
+                            if(r['code']==0){
+                                tr.addClass('tr-danger');
+                                setInterval(function () {
+                                tr.remove();
+                                }, 500);
+                            }
+                        }
+
+                    })
+                }
+            })
+        }
+
+    })
+});
+
+
+function ftUpdate(tr) {
+    let id = tr.attr('data-id'),
+        submit_btn = tr.find('.tr-submit'),
+        update_btn = tr.find('.tr-update'),
+        cancel_btn = tr.find('.tr-cancel'),
+        delete_btn = tr.find('.tr-delete'),
+        name_input = tr.find('input[name="name"]'),
+        code_input = tr.find('input[name="code"]'),
+        old_name = tr.attr('data-name'),
+        new_name = name_input.val(),
+        new_type = tr.find('select').val(),
+        new_code = code_input.val();
+    if(!new_name){return false}
+    if(new_name == old_name){
+        submit_btn.addClass('d-none');  //隐藏保存按钮
+        update_btn.removeClass('d-none');  //显示修改按钮
+        cancel_btn.addClass('d-none');
+        delete_btn.removeClass('d-none');
+        tr.children('.td-name').text(old_name);
+        return true
+    }
+
+    submit_btn.html('<i class="fa fa-spinner fa-pulse"></>');  //把保存按钮改成loading图标
+    submit_btn.attr('disabled', 'disabled');  //保存按钮disabled
+
+    $.ajax({
+        url: '{{ url_for('financing.fp_update') }}',
+        type: 'POST',
+        dataType: 'json',
+        data: {'id': id, 'name': new_name, 'fp_type': new_type, 'fp_code': new_code},
+        success: function (r) {
+            if(r['code']==0){
+                tr.addClass('tr-success');
+                setInterval(function () {
+                    tr.removeClass('tr-success')
+                }, 1000);
+                tr.attr('data-id', r['id']);
+                tr.attr('data-name', r['name']);
+                tr.find('.td-name').text(r['name']);
+                tr.find('.td-type').text(r['fp_type']);
+                tr.find('.td-code').text(r['fp_code']);
+                update_btn.removeClass('d-none');
+                cancel_btn.addClass('d-none');
+                delete_btn.removeClass('d-none');
+                tr.removeClass('clone-tr');
+                submit_btn.addClass('d-none');  //隐藏保存按钮
+                submit_btn.text('提交');
+                submit_btn.removeAttr('disabled');
+            }
+        }
+    })
+}
 </script>
 {% endblock %}

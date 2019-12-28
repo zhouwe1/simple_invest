@@ -22,8 +22,8 @@
             </thead>
             <tbody id="dataTbody">
             {% for agent in agents %}
-                <tr data-id="{{ agent.id }}">
-                    <td class="td-name" data-name="{{ agent.name }}">{{ agent.name }}</td>
+                <tr data-id="{{ agent.id }}" data-name="{{ agent.name }}">
+                    <td class="td-name">{{ agent.name }}</td>
                     <td>
                         <button type="button" class="btn btn-default tr-update">修改</button>
                         <button type="button" class="btn btn-success tr-submit d-none">保存</button>
@@ -34,8 +34,8 @@
             {% endfor %}
             </tbody>
             <tbody id="cloneTbody" class="d-none">
-                <tr class="clone-tr" data-id="0">
-                    <td class="td-name" data-name="">
+                <tr class="clone-tr" data-id="0" data-name="">
+                    <td class="td-name">
                         <div class="form-inline">
                             <input type="text" name="name" maxlength="16" class="form-control" placeholder="请输入名称" autocomplete="off">
                         </div>
@@ -62,7 +62,7 @@ $(function () {
     dataTbody.on('click', '.tr-update', function () {
         let tr = $(this).parents('tr'),
             name_td = tr.find('.td-name'),
-            name = name_td.attr('data-name');
+            name = tr.attr('data-name');
         $(this).addClass('d-none');  //隐藏修改按钮
         tr.find('.tr-delete').addClass('d-none');  //隐藏删除按钮
         tr.find('.tr-cancel').removeClass('d-none');  //显示保存按钮
@@ -72,14 +72,13 @@ $(function () {
     });
 
     dataTbody.on('click', '.tr-submit', function () {
-        let tr = $(this).parents('tr'),
-            id = tr.attr('data-id');
-        agentUpdate(tr, id)
+        let tr = $(this).parents('tr');
+        agentUpdate(tr)
     });
 
     dataTbody.on('click', '.tr-cancel', function () {
         let tr =$(this).parents('tr'),
-            name = tr.children('.td-name').attr('data-name');
+            name = tr.attr('data-name');
         tr.children('.td-name').text(name);
         $(this).addClass('d-none');
         tr.find('.tr-submit').addClass('d-none');
@@ -89,7 +88,7 @@ $(function () {
 
     dataTbody.on('click', '.tr-delete', function () {
         let tr =$(this).parents('tr'),
-            agent_id = tr.attr('data-id');
+            id = tr.attr('data-id');
         if(tr.hasClass('clone-tr')){tr.remove()}
         else{
             bootbox.confirm('确认删除吗？', function (result) {
@@ -101,7 +100,7 @@ $(function () {
                         url: '{{ url_for('financing.agent_delete') }}',
                         type: 'GET',
                         dataType: 'json',
-                        data: {'id': agent_id},
+                        data: {'id': id},
                         success: function (r) {
                             if(r['code']==0){
                                 tr.addClass('tr-danger');
@@ -123,9 +122,11 @@ $(function () {
 function agentUpdate(tr) {
     let submit_btn = tr.find('.tr-submit'),
         update_btn = tr.find('.tr-update'),
+        cancel_btn = tr.find('.tr-cancel'),
+        delete_btn = tr.find('.tr-delete'),
         id = tr.attr('data-id'),
         name_input = tr.find('input[name="name"]'),
-        old_name = tr.find('.td-name').attr('data-name'),
+        old_name = tr.attr('data-name'),
         new_name = name_input.val();
 
     if(!new_name){return false}
@@ -133,6 +134,8 @@ function agentUpdate(tr) {
     if(new_name == old_name){
         submit_btn.addClass('d-none');  //隐藏保存按钮
         update_btn.removeClass('d-none');  //显示修改按钮
+        cancel_btn.addClass('d-none');
+        delete_btn.removeClass('d-none');
         tr.children('.td-name').text(old_name);
         return true
     }
@@ -155,9 +158,11 @@ function agentUpdate(tr) {
                 update_btn.text('修改');
                 update_btn.addClass('btn-default');
                 update_btn.removeClass('btn-success');
+                cancel_btn.addClass('d-none');
+                delete_btn.removeClass('d-none');
                 tr.attr('data-id', r['id']);
+                tr.attr('data-name', r['name']);
                 tr.children('.td-name').text(r['name']);
-                tr.children('.td-name').attr('data-name', r['name']);
                 tr.removeClass('clone-tr');
                 submit_btn.addClass('d-none');  //隐藏保存按钮
                 submit_btn.text('提交');
