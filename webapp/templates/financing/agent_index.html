@@ -77,14 +77,30 @@ $(function () {
     });
 
     dataTbody.on('click', '.tr-delete', function () {
-        let tr =$(this).parents('tr');
+        let tr =$(this).parents('tr'),
+            agent_id = tr.attr('data-id');
         if(tr.hasClass('clone-tr')){tr.remove()}
         else{
             bootbox.confirm('确认删除吗？', function (result) {
                 if(result){
                     tr.find('.tr-delete').attr('disabled', 'disabled');
-                    tr.find('.tr-delete').html('<i class="fa fa-spinner fa-pulse"></>')
+                    tr.find('.tr-delete').html('<i class="fa fa-spinner fa-pulse"></>');
 
+                    $.ajax({
+                        url: '{{ url_for('financing.agent_delete') }}',
+                        type: 'GET',
+                        dataType: 'json',
+                        data: {'id': agent_id},
+                        success: function (r) {
+                            if(r['code']==0){
+                                tr.addClass('tr-danger');
+                                setInterval(function () {
+                                tr.remove();
+                                }, 2000);
+                            }
+                        }
+
+                    })
                 }
             })
         }
@@ -117,7 +133,7 @@ function agentUpdate(tr) {
         url: '{{ url_for('financing.agent_update') }}',
         type: 'POST',
         dataType: 'json',
-        data: {'action': 'update', 'id': id, 'name': new_name},
+        data: {'id': id, 'name': new_name},
         success: function (r) {
             if(r['code']==0){
                 tr.addClass('tr-success');

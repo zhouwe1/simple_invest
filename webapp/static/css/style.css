@@ -5,3 +5,7 @@
 .tr-error {
     background-color: #ff828c;
 }
+
+.tr-danger {
+    background-color: #f9ffc6;
+}

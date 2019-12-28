@@ -32,25 +32,27 @@ def agent_index():
 @login_required
 def agent_update():
     form = request.form
-    action = form.get('action')
     agent_id = form.get('id')
     name = form.get('name')
 
-    time.sleep(2)
+    if Agent.query.filter(Agent.name == name, Agent.id != agent_id).count():
+        return jsonify({'code': 1, 'msg': '名称重复，请更换其他名称'})
+    if agent_id == '0':
+        agent = Agent(name=name)
+    else:
+        agent = Agent.query.filter_by(id=agent_id).first()
+        agent.name = name
+        db.session.commit()
+    return jsonify({'code': 0, 'name': agent.name, 'id': agent.id})
 
-    if action == 'update':
-        if Agent.query.filter(Agent.name == name, Agent.id != agent_id).count():
-            return jsonify({'code': 1, 'msg': '名称重复，请更换其他名称'})
-        if agent_id == '0':
-            agent = Agent(name=name)
-        else:
-            agent = Agent.query.filter_by(id=agent_id).first()
-            agent.name = name
-            db.session.commit()
-        return jsonify({'code': 0, 'name': agent.name, 'id': agent.id})
-    elif action == 'delete':
-        pass
-        return jsonify({'code': 0, 'msg': '修改成功'})
+
+@financing_blueprint.route('/agent_delete')
+@login_required
+def agent_delete():
+    agent = Agent.query.filter_by(id=request.args.get('id')).first()
+    db.session.delete(agent)
+    db.session.commit()
+    return jsonify({'code': 0})
 
 
 @financing_blueprint.route('/financial_product')
