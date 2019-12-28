@@ -55,7 +55,7 @@ def agent_delete():
     return jsonify({'code': 0})
 
 
-@financing_blueprint.route('/financial_product')
+@financing_blueprint.route('/financial_products')
 @login_required
 def fp_index():
     fps = FinancialProduct.query.order_by(desc('id')).all()
@@ -100,3 +100,12 @@ def fp_delete():
     db.session.delete(fp)
     db.session.commit()
     return jsonify({'code': 0})
+
+
+@financing_blueprint.route('/holdings')
+def holdings():
+    uas = UserAsset.query.filter_by(user_id=current_user.id).order_by(desc('update_time')).all()
+    return render_template(
+        'financing/holdings.html',
+        uas=uas,
+    )

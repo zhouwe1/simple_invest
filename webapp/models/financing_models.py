@@ -11,7 +11,7 @@ class UserAsset(db.Model):
     agent_id = db.Column(db.Integer(), db.ForeignKey('agent.id', ondelete='RESTRICT'))
     fp = db.Column(db.Integer(), db.ForeignKey('financial_product.id', ondelete='RESTRICT'))
     start_time = db.Column(db.DateTime(timezone=True))  # 第一次买入时间
-    update_time = db.Column(db.DateTime(timezone=True))  # 最后一次买入时间
+    update_time = db.Column(db.DateTime(timezone=True), index=True)  # 最后更新时间
     amount = db.Column(db.Integer())
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='RESTRICT'))
 
