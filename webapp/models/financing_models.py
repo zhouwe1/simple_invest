@@ -44,7 +44,7 @@ class FinancialProduct(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(32), unique=True)
     code = db.Column(db.Integer(), unique=True)  # 基金/股票 代码
-    type = db.Column(db.SmallInteger())  # 类型 基金/股票/银行理财/其他理财
+    type = db.Column(db.Integer(), db.ForeignKey('fp_type.id', ondelete='RESTRICT'))
     url = db.Column(db.Text(), default='{}')
     meta = db.Column(db.Text(), default='{}')
     update_time = db.Column(db.DateTime(timezone=True))  # 更新时间
@@ -63,3 +63,10 @@ class FPAsset(db.Model):
     name = db.Column(db.String(16), unique=True)
 
 
+class FPType(db.Model):
+    """
+    理财产品类型
+    0其他/ 1基金/ 2股票/ 3银行理财/ 4保险理财
+    """
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(8), unique=True)
