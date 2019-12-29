@@ -108,6 +108,16 @@ $(function () {
                                 tr.remove();
                                 }, 300);
                             }
+                            else{
+                                $.growl.error({title: '发生错误', message: r['msg'], location:"tr"});
+                                tr.removeClass('tr-danger');
+                                tr.addClass('tr-error');
+                                setInterval(function () {
+                                    tr.removeClass('tr-error');
+                                }, 300);
+                                tr.find('.tr-delete').html('删除');
+                                tr.find('.tr-delete').removeAttr('disabled');
+                            }
                         }
 
                     })

@@ -55,7 +55,7 @@
             <tbody id="dataTbody">
             {% for ua in uas %}
                 <tr data-id="{{ ua.id }}">
-                    <td>{{ ua.financial_product.name }}</td>
+                    <td>{{ ua.agent.name }}:{{ ua.financial_product.name }}</td>
                     <td>{{ ua.last_amount.amount }}</td>
                     <td>{{ ua.last_amount.update_time }}</td>
                     <td>

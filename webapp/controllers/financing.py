@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session, abort, flash
 from flask_login import current_user, login_required
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import desc
 from webapp.models.financing_models import Agent, FinancialProduct, UserAsset, UAAmount, FPType
 from webapp.extentions import db
@@ -50,9 +51,12 @@ def agent_update():
 @login_required
 def agent_delete():
     agent = Agent.query.filter_by(id=request.args.get('id')).first()
-    db.session.delete(agent)
-    db.session.commit()
-    return jsonify({'code': 0})
+    try:
+        db.session.delete(agent)
+        db.session.commit()
+        return jsonify({'code': 0})
+    except IntegrityError:
+        return jsonify({'code': 1, 'msg': '持仓中的渠道不允许删除'})
 
 
 @financing_blueprint.route('/financial_products')
@@ -97,9 +101,12 @@ def fp_update():
 @login_required
 def fp_delete():
     fp = FinancialProduct.query.filter_by(id=request.args.get('id')).first()
-    db.session.delete(fp)
-    db.session.commit()
-    return jsonify({'code': 0})
+    try:
+        db.session.delete(fp)
+        db.session.commit()
+        return jsonify({'code': 0})
+    except IntegrityError:
+        return jsonify({'code': 1, 'msg': '持仓中的理财产品不允许删除'})
 
 
 @financing_blueprint.route('/holdings')
