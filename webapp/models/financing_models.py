@@ -19,7 +19,7 @@ class UserAsset(db.Model):
     )
 
     __table_args__ = (
-        UniqueConstraint('fp', 'user_id', name='uix_fp_user'),  # 联合唯一索引
+        UniqueConstraint('fp', 'agent_id', 'user_id', name='uix_ag_fp_user'),  # 联合唯一索引
     )
 
 
