@@ -1,6 +1,6 @@
 
 
-$('.tr-add').click(function () {
+$('.tr-clone').click(function () {
     let clone_tr = $('#dataTbody .clone-tr');
 
     if (clone_tr.length > 0){
@@ -11,5 +11,18 @@ $('.tr-add').click(function () {
     }
     else{
         $('#dataTbody').prepend($('#cloneTbody > tr').clone())
+    }
+});
+
+$('.tr-add').click(function () {
+    let newTbody = $('#newTbody');
+    if(newTbody.hasClass('d-none')){
+        $('#newTbody').removeClass('d-none');
+    }
+    else{
+        newTbody.children('tr').addClass('tr-error');
+        setTimeout(function(){
+            newTbody.children('tr').removeClass('tr-error')
+        }, 100)
     }
 });

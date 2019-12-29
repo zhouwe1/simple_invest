@@ -14,39 +14,18 @@
         </div>
     </div>
     <div class="card-body table-responsive p-0">
-        <table class="table table-valign-middle">
+        <table class="table table-valign-middle table-editable">
             <thead>
             <tr>
-                <th>名称</th>
-                <th>理财产品</th>
-                <th>类型</th>
-                <th>持有金额</th>
-                <th>更新时间</th>
-                <th>操作</th>
+                <th width="30%">理财产品</th>
+                <th width="10%">类型</th>
+                <th width="15%">持有金额</th>
+                <th width="15">更新时间</th>
+                <th width="30%">操作</th>
             </tr>
             </thead>
-            <tbody id="dataTbody">
-            {% for fp in fps %}
-                <tr data-id="{{ fp.id }}" data-name="{{ fp.name }}" data-type="" data-code="{{ fp.code }}">
-                    <td class="td-name">{{ fp.name }}</td>
-                    <td>{{ fp.type.name }}</td>
-                    <td>{{ fp.code|default('', True) }}</td>
-                    <td></td>
-                    <td></td>
-                    <td>
-                        <button type="button" class="btn btn-default tr-update">修改</button>
-                        <button type="button" class="btn btn-success tr-submit d-none">保存</button>
-                        <button type="button" class="btn btn-danger tr-delete">删除</button>
-                        <button type="button" class="btn btn-warning tr-cancel d-none">取消</button>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-            <tbody id="cloneTbody" class="d-none">
-                <tr class="clone-tr" data-id="0" data-name="" data-type="" data-code="">
-                    <td class="td-name">
-                        <input type="text" name="name" class="form-control" maxlength="32" placeholder="请输入名称" autocomplete="off">
-                    </td>
+            <tbody id="newTbody" class="d-none">
+                <tr data-id="0" data-name="" data-type="" data-code="">
                     <td class="td-fp">
                         <div class="form-inline">
                             <input type="text" name="fp" class="form-control" placeholder="模糊查询" autocomplete="off">
@@ -68,6 +47,22 @@
 
                 </tr>
             </tbody>
+            <tbody id="dataTbody">
+            {% for fp in fps %}
+                <tr data-id="{{ fp.id }}">
+                    <td>{{ fp.type.name }}</td>
+                    <td>{{ fp.code|default('', True) }}</td>
+                    <td></td>
+                    <td></td>
+                    <td>
+                        <button type="button" class="btn btn-default tr-update">修改</button>
+                        <button type="button" class="btn btn-success tr-submit d-none">保存</button>
+                        <button type="button" class="btn btn-danger tr-delete">删除</button>
+                        <button type="button" class="btn btn-warning tr-cancel d-none">取消</button>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
         </table>
     </div>
 </div>
@@ -78,14 +73,14 @@
 {% block footer_script %}
 <script type="text/javascript">
 $(function () {
-    let dataTbody = $('#dataTbody');
+    let table = $('.table-editable');
 
-    dataTbody.on('click', '.tr-submit', function () {
+    table.on('click', '.tr-submit', function () {
         let tr = $(this).parents('tr');
         ftUpdate(tr)
     });
 
-    dataTbody.on('click', '.tr-update', function(){
+    table.on('click', '.tr-update', function(){
         let tr = $(this).parents('tr'),
             name_td = tr.find('.td-name'),
             name = tr.attr('data-name');
@@ -97,7 +92,7 @@ $(function () {
         tr.find('.tr-cancel').removeClass('d-none');
     });
 
-    dataTbody.on('click', '.tr-cancel', function(){
+    table.on('click', '.tr-cancel', function(){
         let tr = $(this).parents('tr'),
             name_td = tr.find('.td-name'),
             name = tr.attr('data-name');
@@ -108,11 +103,15 @@ $(function () {
         tr.find('.tr-cancel').addClass('d-none');
     });
 
-    dataTbody.on('click', '.tr-delete', function () {
+    table.on('click', '.tr-delete', function () {
         let tr =$(this).parents('tr'),
             id = tr.attr('data-id');
-        if(tr.hasClass('clone-tr')){tr.remove()}
+        if(id=='0'){
+            $(this).parents('tbody').addClass('d-none');  //隐藏newTbody
+            $(this).parents('tr').find('input').each(function () {$(this).val('')})
+        }
         else{
+            tr.addClass('tr-danger');
             bootbox.confirm('确认删除吗？', function (result) {
                 if(result){
                     tr.find('.tr-delete').attr('disabled', 'disabled');
@@ -125,7 +124,7 @@ $(function () {
                         data: {'id': id},
                         success: function (r) {
                             if(r['code']==0){
-                                tr.addClass('tr-danger');
+
                                 setInterval(function () {
                                 tr.remove();
                                 }, 300);
@@ -134,10 +133,28 @@ $(function () {
 
                     })
                 }
+                else{
+                    tr.removeClass('tr-danger')
+                }
             })
         }
 
-    })
+    });
+
+    let fps = [
+        {% for fp in fps %}
+        { value: '{{ fp.name }}', data: '{{ fp.id }}' },
+        {% endfor %}
+    ];
+
+
+
+    $('#newTbody input[name="fp"]').autocomplete({
+        lookup: fps,
+        onSelect: function (suggestion) {
+            alert('You selected: ' + suggestion.value + ', ' + suggestion.data);
+        }
+    });
 });
 
 

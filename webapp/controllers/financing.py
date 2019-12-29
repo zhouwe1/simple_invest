@@ -34,7 +34,7 @@ def agent_update():
     form = request.form
     agent_id = form.get('id')
     name = form.get('name')
-    time.sleep(3)
+
     if Agent.query.filter(Agent.name == name, Agent.id != agent_id).count():
         return jsonify({'code': 1, 'msg': '名称重复'})
     if agent_id == '0':
@@ -78,7 +78,7 @@ def fp_update():
     if FinancialProduct.query.filter(FinancialProduct.name == name, FinancialProduct.id != fp_id).count():
         return jsonify({'code': 1, 'msg': '名称重复'})
 
-    if fp_type in (3,4) and not fp_code:
+    if fp_type in (3, 4) and not fp_code:
         return jsonify({'code': 1, 'msg': '股票或基金请填写代码'})
 
     if fp_code:
