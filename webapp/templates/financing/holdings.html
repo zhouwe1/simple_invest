@@ -9,6 +9,15 @@
 <div class="card">
     <div class="card-header border-0">
         <h3 class="card-title"></h3>
+        <div class="form-inline float-left">
+            <select class="form-control" id="type_fill" onchange="tFill()">
+                <option value="">按分类查看</option>
+                {% for fp_t in fp_types %}
+                <option value="{{ fp_t.id }}" {% if request.args.fp_type == fp_t.id|string %}selected{% endif %}>{{ fp_t.name }}</option>
+                {% endfor %}
+        </select>
+        </div>
+
         <div class="card-tools">
             <button type="button" class="btn btn-success btn-md tr-add">Add</button>
         </div>
@@ -242,6 +251,11 @@ function uaUpdate(tr) {
             }
         }
     })
+}
+
+function tFill() {
+    let type_id = $('#type_fill').val();
+    window.location.href = '?fp_type=' + type_id
 }
 </script>
 {% endblock %}

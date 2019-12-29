@@ -112,12 +112,22 @@ def fp_delete():
 
 @financing_blueprint.route('/holdings')
 def holdings():
-    uas = UserAsset.query.filter_by(user_id=current_user.id).order_by(desc('update_time')).all()
+    form = request.args
+    query_dict = {'user_id': current_user.id}
+    # if form.get('fp_type'):
+    #     query_dict['fp.type_id'] = form.get('fp_type')
+
+    uas = UserAsset.query.filter_by(**query_dict)
+    if form.get('fp_type'):
+        uas = uas.join(FPType, FPType.id == form.get('fp_type')).join(FinancialProduct, FinancialProduct.type_id == FPType.id)
+
+    uas = uas.order_by(UserAsset.update_time.desc()).all()
     return render_template(
         'financing/holdings.html',
         uas=uas,
         fps=FinancialProduct.query.order_by(desc('id')).all(),
-        agents=Agent.query.order_by('id').all()
+        agents=Agent.query.order_by('id').all(),
+        fp_types=FPType.query.order_by('id').all(),
     )
 
 
