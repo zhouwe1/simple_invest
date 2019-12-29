@@ -1,4 +1,4 @@
-from sqlalchemy import UniqueConstraint
+from sqlalchemy import UniqueConstraint, desc
 from webapp.extentions import db
 
 
@@ -7,13 +7,37 @@ class UserAsset(db.Model):
     用户投资项目
     """
     id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(32))
-    agent_id = db.Column(db.Integer(), db.ForeignKey('agent.id', ondelete='RESTRICT'))
-    fp = db.Column(db.Integer(), db.ForeignKey('financial_product.id', ondelete='RESTRICT'))
+    agent_id = db.Column(db.Integer(), db.ForeignKey('agent.id', ondelete='RESTRICT'), nullable=False)
+    fp = db.Column(db.Integer(), db.ForeignKey('financial_product.id', ondelete='RESTRICT'), nullable=False)
     start_time = db.Column(db.DateTime(timezone=True))  # 第一次买入时间
     update_time = db.Column(db.DateTime(timezone=True), index=True)  # 最后更新时间
-    amount = db.Column(db.Integer())
-    user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='RESTRICT'))
+    user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='RESTRICT'), nullable=False)
+    amounts = db.relationship(
+        'UAAmount',
+        backref='user_asset',
+        lazy='dynamic'
+    )
+
+    __table_args__ = (
+        UniqueConstraint('fp', 'user_id', name='uix_fp_user'),  # 联合唯一索引
+    )
+
+
+    @property
+    def last_amount(self):
+        return self.amounts.order_by(desc('id')).first()
+
+
+class UAAmount(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    date = db.Column(db.Date())
+    userasset_id = db.Column(db.Integer(), db.ForeignKey('user_asset.id', ondelete='RESTRICT'), nullable=False)
+    amount = db.Column(db.Integer(), default=0)
+    update_time = db.Column(db.DateTime(timezone=True))
+
+    __table_args__ = (
+        UniqueConstraint('userasset_id', 'date', name='uix_uaid_date'),  # 联合唯一索引
+    )
 
 
 class Agent(db.Model):
@@ -34,8 +58,8 @@ class Agent(db.Model):
 
 fp_assets = db.Table(
     'fp_assets',
-    db.Column('fp_id', db.Integer(), db.ForeignKey('financial_product.id')),
-    db.Column('fpa_id', db.Integer(), db.ForeignKey('fp_asset.id')),
+    db.Column('fp_id', db.Integer(), db.ForeignKey('financial_product.id'), nullable=False),
+    db.Column('fpa_id', db.Integer(), db.ForeignKey('fp_asset.id'), nullable=False),
     UniqueConstraint('fp_id', 'fpa_id', name='fp_fpa_unique')  # 联合唯一索引,name索引的名字
 )
 
@@ -44,7 +68,7 @@ class FinancialProduct(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(32), unique=True)
     code = db.Column(db.Integer(), unique=True)  # 基金/股票 代码
-    type_id = db.Column(db.Integer(), db.ForeignKey('fp_type.id', ondelete='RESTRICT'))
+    type_id = db.Column(db.Integer(), db.ForeignKey('fp_type.id', ondelete='RESTRICT'), nullable=False)
     url = db.Column(db.Text(), default='{}')
     meta = db.Column(db.Text(), default='{}')
     update_time = db.Column(db.DateTime(timezone=True))  # 更新时间
@@ -52,6 +76,11 @@ class FinancialProduct(db.Model):
         'FPAsset',
         secondary=fp_assets,
         backref=db.backref('fps', lazy='dynamic')
+    )
+    us_assets = db.relationship(
+        'UserAsset',
+        backref='financial_product',
+        lazy='dynamic'
     )
 
     def __init__(self, name, type_id, code=None):
