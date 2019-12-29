@@ -27,7 +27,7 @@
                 <tr data-id="0" data-name="" data-type="" data-code="">
                     <td class="td-fp">
                         <div class="form-inline">
-                            <input type="text" name="fp" class="form-control" placeholder="模糊查询" autocomplete="off">
+                            <input type="text" name="new_fp" class="form-control" placeholder="模糊查询" autocomplete="off">
                         </div>
                     </td>
                     <td>
@@ -37,7 +37,7 @@
                     </td>
                     <td>
                          <div class="form-inline">
-                             <select class="form-control">
+                             <select class="form-control" name="new_agent">
                              <option value="">购买渠道</option>
                                  {% for agent in agents %}
                                  <option value="{{ agent.id }}">{{ agent.name }}</option>
@@ -56,7 +56,7 @@
             {% for ua in uas %}
                 <tr data-id="{{ ua.id }}">
                     <td>{{ ua.agent.name }}:{{ ua.financial_product.name }}</td>
-                    <td>{{ ua.last_amount.amount }}</td>
+                    <td>{{ ua.last_amount.amount_yuan }}</td>
                     <td>{{ ua.last_amount.update_time }}</td>
                     <td>
                         <button type="button" class="btn btn-default tr-update">修改</button>
@@ -76,20 +76,18 @@
 
 {% block footer_script %}
 <script type="text/javascript">
+let fp_list = [{% for fp in fps %}'{{ fp.name }}',{% endfor %}];
 $(function () {
     let table = $('.table-editable');
 
     table.on('click', '.tr-submit', function () {
         let tr = $(this).parents('tr');
-        ftUpdate(tr)
+        uaUpdate(tr)
     });
 
     table.on('click', '.tr-update', function(){
-        let tr = $(this).parents('tr'),
-            name_td = tr.find('.td-name'),
-            name = tr.attr('data-name');
-        name_td.html('<input type="text" name="name" maxlength="32" class="form-control"' +
-            ' value="' + name + '" placeholder="请输入名称" autocomplete="off">');
+        let tr = $(this).parents('tr');
+
         tr.find('.tr-update').addClass('d-none');
         tr.find('.tr-submit').removeClass('d-none');
         tr.find('.tr-delete').addClass('d-none');
@@ -144,18 +142,9 @@ $(function () {
 
     });
 
-    let fps = [
-        {% for fp in fps %}
-        { value: '{{ fp.name }}', data: '{{ fp.id }}' },
-        {% endfor %}
-    ];
-
-    $('#newTbody input[name="fp"]').autocomplete({
-        lookup: fps,
-        autoSelectFirst: true,
-        onSelect: function (suggestion) {
-            //alert('You selected: ' + suggestion.value + ', ' + suggestion.data);
-        }
+    $('input[name="new_fp"]').autocomplete({
+        lookup: fp_list,
+        autoSelectFirst: true
     });
 });
 
@@ -166,74 +155,89 @@ function resetNewTbody() {
     tbody.find('select').val('')
 }
 
-function ftUpdate(tr) {
-    let id = tr.attr('data-id'),
+function uaUpdate(tr) {
+    let error_ct = 0,
+        id = tr.attr('data-id'),
         submit_btn = tr.find('.tr-submit'),
         update_btn = tr.find('.tr-update'),
         cancel_btn = tr.find('.tr-cancel'),
         delete_btn = tr.find('.tr-delete'),
-        name_input = tr.find('input[name="name"]'),
-        code_input = tr.find('input[name="code"]'),
-        old_name = tr.attr('data-name'),
-        new_name = name_input.val(),
-        new_type = tr.find('select').val(),
-        new_code = code_input.val();
-    if(!new_name){return false}
-    if(new_name == old_name){
-        submit_btn.addClass('d-none');  //隐藏保存按钮
-        update_btn.removeClass('d-none');  //显示修改按钮
-        cancel_btn.addClass('d-none');
-        delete_btn.removeClass('d-none');
-        tr.children('.td-name').text(old_name);
-        return true
-    }
+        fp = tr.find('input[name="new_fp"]').val(),
+        agent = tr.find('select[name="new_agent"]').val(),
+        amount = tr.find('input[name="amount"]').val();
 
-    if(new_type == 3 || new_type == 4){
-        if (!new_code){
-            tr.addClass('tr-error');
-            setInterval(function () {
-                tr.removeClass('tr-error')
-            }, 1000);
-            $.growl.error({title: '发生错误', message: '股票或基金请填写代码', location:"tr"});
-            return false
+    function formError(title, msg){
+        tr.addClass('tr-error');
+        setInterval(function () {
+            tr.removeClass('tr-error');
+        }, 1000);
+        $.growl.error({title: title, message: msg, location:"tr"});
+        error_ct += 1
+    }
+    if(tr.find('input[name="new_fp"]').length>0){
+        if(fp_list.indexOf(fp) == -1){
+            formError('理财产品错误', '请选择已有的理财产品，也可以添加新的理财产品')
         }
     }
+    if(!amount){
+        formError('金额错误', '请输入持有金额')
+    }
+    if(tr.find('select[name="new_agent"]').length>0){
+        if(!agent){
+            formError('购买渠道错误', '请选择购买渠道')
+        }
+    }
+    if(error_ct>0){return false}
 
     submit_btn.html('<i class="fa fa-spinner fa-pulse"></>');  //把保存按钮改成loading图标
     submit_btn.attr('disabled', 'disabled');  //保存按钮disabled
 
     $.ajax({
-        url: '{{ url_for('financing.fp_update') }}',
+        url: '{{ url_for('financing.holdings_update') }}',
         type: 'POST',
         dataType: 'json',
-        data: {'id': id, 'name': new_name, 'fp_type': new_type, 'fp_code': new_code},
+        data: {'id': id, 'fp': fp, 'agent': agent, 'amount': amount},
         success: function (r) {
             if(r['code']==0){
-                tr.addClass('tr-success');
-                setInterval(function () {
-                    tr.removeClass('tr-success')
-                }, 1000);
-                tr.attr('data-id', r['id']);
-                tr.attr('data-name', r['name']);
-                tr.find('.td-name').text(r['name']);
-                tr.find('.td-type').text(r['fp_type']);
-                tr.find('.td-code').text(r['fp_code']);
-                update_btn.removeClass('d-none');
-                cancel_btn.addClass('d-none');
-                delete_btn.removeClass('d-none');
-                tr.removeClass('clone-tr');
-                submit_btn.addClass('d-none');  //隐藏保存按钮
-                submit_btn.text('提交');
-                submit_btn.removeAttr('disabled');
+                if (id==0){
+                    resetNewTbody();
+                    $('#dataTbody').prepend('' +
+                        '<tr data-id="'+ r['id'] +'">' +
+                        '<td>'+ r['name'] + '</td>' +
+                        '<td>'+ r['amount'] +'</td>' +
+                        '<td>'+ r['update_time'] +'</td>' +
+                        '<td>' +
+                        '    <button type="button" class="btn btn-default tr-update">修改</button>' +
+                        '    <button type="button" class="btn btn-success tr-submit d-none">保存</button>' +
+                        '    <button type="button" class="btn btn-danger tr-delete">删除</button>' +
+                        '    <button type="button" class="btn btn-warning tr-cancel d-none">取消</button>' +
+                        '</td>' +
+                        '</tr>')
+                }
+                else{
+                    tr.addClass('tr-success');
+                    setInterval(function () {
+                        tr.removeClass('tr-success')
+                    }, 1000);
+                    tr.attr('data-id', r['id']);
+                    tr.attr('data-name', r['name']);
+                    tr.find('.td-name').text(r['name']);
+                    tr.find('.td-type').text(r['fp_type']);
+                    tr.find('.td-code').text(r['fp_code']);
+                    update_btn.removeClass('d-none');
+                    cancel_btn.addClass('d-none');
+                    delete_btn.removeClass('d-none');
+                    tr.removeClass('clone-tr');
+                    submit_btn.addClass('d-none');  //隐藏保存按钮
+                    submit_btn.text('提交');
+                    submit_btn.removeAttr('disabled');
+                }
+
             }
             else{
-                tr.addClass('tr-error');
-                setInterval(function () {
-                    tr.removeClass('tr-error')
-                }, 1000);
+                formError('发生错误', r['msg']);
                 submit_btn.text('提交');
                 submit_btn.removeAttr('disabled');
-                $.growl.error({title: '发生错误', message: r['msg'], location:"tr"});
             }
         }
     })

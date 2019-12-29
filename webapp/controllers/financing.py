@@ -4,7 +4,8 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import desc
 from webapp.models.financing_models import Agent, FinancialProduct, UserAsset, UAAmount, FPType
 from webapp.extentions import db
-import time
+from webapp.functions.logs import logger
+import traceback
 
 
 financing_blueprint = Blueprint(
@@ -118,3 +119,39 @@ def holdings():
         fps=FinancialProduct.query.order_by(desc('id')).all(),
         agents=Agent.query.order_by('id').all()
     )
+
+
+@financing_blueprint.route('/holdings_update', methods=['POST'])
+def holdings_update():
+    form = request.form
+    ua_id = form.get('id')
+    amount = float(form.get('amount')) * 100
+
+    if ua_id == '0':
+        agent_id = form.get('agent')
+        fp_name = form.get('fp')
+
+        agent = Agent.query.filter_by(id=agent_id).first()
+        if not agent:
+            return jsonify({'code': 1, 'msg': '购买渠道错误'})
+        fp = FinancialProduct.query.filter_by(name=fp_name).first()
+        if not fp:
+            return jsonify({'code': 1, 'msg': '理财产品错误'})
+        if UserAsset.query.filter_by(agent_id=agent_id, fp=fp.id).count():
+            return jsonify({'code': 1, 'msg': '已在{}购买过{}，不要重复添加'.format(agent.name, fp.name)})
+        try:
+            ua = UserAsset(agent_id, fp.id, current_user.id)
+            uaa = UAAmount.update(ua.id, amount)
+            ua.update_time = uaa.update_time
+            db.session.commit()
+            return jsonify({
+                'code': 0,
+                'id': ua.id,
+                'name': ua.fp_name,
+                'amount': str(ua.last_amount.amount_yuan),
+                'update_time': ua.update_time_str,
+            })
+        except:
+            logger.error('add user_asset error: {}'.format(traceback.format_exc()))
+            db.session.rollback()
+            return jsonify({'code': 1, 'msg': '系统错误'})

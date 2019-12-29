@@ -1,5 +1,6 @@
 from sqlalchemy import UniqueConstraint, desc
 from webapp.extentions import db
+from webapp.functions.public import now as _now
 
 
 class UserAsset(db.Model):
@@ -22,10 +23,24 @@ class UserAsset(db.Model):
         UniqueConstraint('fp', 'agent_id', 'user_id', name='uix_ag_fp_user'),  # 联合唯一索引
     )
 
+    def __init__(self, agent_id, fp, user_id):
+        self.agent_id = agent_id
+        self.fp = fp
+        self.user_id = user_id
+        db.session.add(self)
+        db.session.flush()
+
+    @property
+    def fp_name(self):
+        return '{}:{}'.format(self.agent.name, self.financial_product.name)
 
     @property
     def last_amount(self):
         return self.amounts.order_by(desc('id')).first()
+
+    @property
+    def update_time_str(self):
+        return self.update_time.strftime("%Y-%m-%d %H:%M:%S")
 
 
 class UAAmount(db.Model):
@@ -38,6 +53,30 @@ class UAAmount(db.Model):
     __table_args__ = (
         UniqueConstraint('userasset_id', 'date', name='uix_uaid_date'),  # 联合唯一索引
     )
+
+    def __init__(self, ua_id, amount, now):
+        self.userasset_id = ua_id
+        self.amount = amount
+        self.date = now.date()
+        self.update_time = now
+        db.session.add(self)
+        db.session.flush()
+
+    @property
+    def amount_yuan(self):
+        return round(self.amount / 100, 2)
+
+    @staticmethod
+    def update(ua_id, amount):
+        now = _now()
+        date = now.date()
+        uaa = UAAmount.query.filter_by(date=date, userasset_id=ua_id).first()
+        if uaa:
+            uaa.amount = amount
+            uaa.update_time = now
+        else:
+            uaa = UAAmount(ua_id, amount, now)
+        return uaa
 
 
 class Agent(db.Model):
