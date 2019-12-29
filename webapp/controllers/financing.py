@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, jsonify, redirect, url_for, session, abort, flash
 from flask_login import current_user, login_required
 from sqlalchemy.sql import desc
-from webapp.models.financing_models import Agent, FinancialProduct, UserAsset, FPType
+from webapp.models.financing_models import Agent, FinancialProduct, UserAsset, UAAmount, FPType
 from webapp.extentions import db
 import time
 
@@ -108,4 +108,5 @@ def holdings():
     return render_template(
         'financing/holdings.html',
         uas=uas,
+        fps=FinancialProduct.query.order_by(desc('id')).all(),
     )

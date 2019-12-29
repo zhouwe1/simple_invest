@@ -18,9 +18,8 @@
             <thead>
             <tr>
                 <th width="30%">理财产品</th>
-                <th width="10%">类型</th>
-                <th width="15%">持有金额</th>
-                <th width="15">更新时间</th>
+                <th width="20%">持有金额</th>
+                <th width="20%">更新时间</th>
                 <th width="30%">操作</th>
             </tr>
             </thead>
@@ -31,29 +30,25 @@
                             <input type="text" name="fp" class="form-control" placeholder="模糊查询" autocomplete="off">
                         </div>
                     </td>
-                    <td class="td-amount"></td>
                     <td>
                         <div class="form-inline">
-                            <input type="number" name="amount" class="form-control" step="1" autocomplete="off">
+                            <input type="number" name="amount" class="form-control" step="1" min="0" max="999999" autocomplete="off">
                         </div>
                     </td>
                     <td></td>
                     <td>
-                        <button type="button" class="btn btn-default tr-update d-none">修改</button>
                         <button type="button" class="btn btn-success tr-submit">保存</button>
                         <button type="button" class="btn btn-danger tr-delete">删除</button>
-                        <button type="button" class="btn btn-warning tr-cancel d-none">取消</button>
                     </td>
 
                 </tr>
             </tbody>
             <tbody id="dataTbody">
-            {% for fp in fps %}
-                <tr data-id="{{ fp.id }}">
-                    <td>{{ fp.type.name }}</td>
-                    <td>{{ fp.code|default('', True) }}</td>
-                    <td></td>
-                    <td></td>
+            {% for ua in uas %}
+                <tr data-id="{{ ua.id }}">
+                    <td>{{ ua.financial_product.name }}</td>
+                    <td>{{ ua.last_amount.amount }}</td>
+                    <td>{{ ua.last_amount.update_time }}</td>
                     <td>
                         <button type="button" class="btn btn-default tr-update">修改</button>
                         <button type="button" class="btn btn-success tr-submit d-none">保存</button>
