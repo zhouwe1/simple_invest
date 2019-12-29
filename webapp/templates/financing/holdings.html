@@ -54,10 +54,10 @@
             </tbody>
             <tbody id="dataTbody">
             {% for ua in uas %}
-                <tr data-id="{{ ua.id }}">
+                <tr data-id="{{ ua.id }}" data-amount="{{ ua.last_amount.amount_yuan }}" data-update_time="{{ ua.last_amount.update_time }}">
                     <td>{{ ua.agent.name }}:{{ ua.financial_product.name }}</td>
-                    <td>{{ ua.last_amount.amount_yuan }}</td>
-                    <td>{{ ua.last_amount.update_time }}</td>
+                    <td class="td-amount">{{ ua.last_amount.amount_yuan }}</td>
+                    <td class="td-update_time">{{ ua.last_amount.update_time }}</td>
                     <td>
                         <button type="button" class="btn btn-default tr-update">修改</button>
                         <button type="button" class="btn btn-success tr-submit d-none">保存</button>
@@ -86,19 +86,23 @@ $(function () {
     });
 
     table.on('click', '.tr-update', function(){
-        let tr = $(this).parents('tr');
+        let tr = $(this).parents('tr'),
+            current_amount = tr.attr('data-amount');
 
         tr.find('.tr-update').addClass('d-none');
         tr.find('.tr-submit').removeClass('d-none');
         tr.find('.tr-delete').addClass('d-none');
         tr.find('.tr-cancel').removeClass('d-none');
+
+        tr.find('.td-amount').html('<div class="form-inline"><input type="number" value="'+ current_amount +'"' +
+            ' name="amount" class="form-control" step="1" min="-99999" max="999999" autocomplete="off"></div>');
     });
 
     table.on('click', '.tr-cancel', function(){
         let tr = $(this).parents('tr'),
-            name_td = tr.find('.td-name'),
-            name = tr.attr('data-name');
-        name_td.text(name);
+            amount = tr.attr('data-amount'),
+            amount_td = tr.find('.td-amount');
+        amount_td.text(amount);
         tr.find('.tr-update').removeClass('d-none');
         tr.find('.tr-submit').addClass('d-none');
         tr.find('.tr-delete').removeClass('d-none');
@@ -202,10 +206,10 @@ function uaUpdate(tr) {
                 if (id==0){
                     resetNewTbody();
                     $('#dataTbody').prepend('' +
-                        '<tr data-id="'+ r['id'] +'">' +
+                        '<tr data-id="'+ r['id'] +'" data-amount="'+ r['amount'] +'">' +
                         '<td>'+ r['name'] + '</td>' +
-                        '<td>'+ r['amount'] +'</td>' +
-                        '<td>'+ r['update_time'] +'</td>' +
+                        '<td class="td-amount">'+ r['amount'] +'</td>' +
+                        '<td class="td-update_time">'+ r['update_time'] +'</td>' +
                         '<td>' +
                         '    <button type="button" class="btn btn-default tr-update">修改</button>' +
                         '    <button type="button" class="btn btn-success tr-submit d-none">保存</button>' +
