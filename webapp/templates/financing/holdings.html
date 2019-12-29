@@ -223,11 +223,8 @@ function uaUpdate(tr) {
                     setInterval(function () {
                         tr.removeClass('tr-success')
                     }, 1000);
-                    tr.attr('data-id', r['id']);
-                    tr.attr('data-name', r['name']);
-                    tr.find('.td-name').text(r['name']);
-                    tr.find('.td-type').text(r['fp_type']);
-                    tr.find('.td-code').text(r['fp_code']);
+                    tr.find('.td-amount').text(r['amount']);
+                    tr.find('.td-update_time').text(r['update_time']);
                     update_btn.removeClass('d-none');
                     cancel_btn.addClass('d-none');
                     delete_btn.removeClass('d-none');

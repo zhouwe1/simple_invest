@@ -164,7 +164,7 @@ def holdings_update():
             uaa = UAAmount.update(ua.id, amount)
             ua.update_time = uaa.update_time
             db.session.commit()
-            return jsonify({'code': 0, 'msg': ''})
+            return jsonify({'code': 0, 'amount': str(ua.last_amount.amount_yuan), 'update_time': ua.update_time_str})
         except:
             logger.error('update user_asset error: {}'.format(traceback.format_exc()))
             db.session.rollback()
