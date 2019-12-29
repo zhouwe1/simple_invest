@@ -124,6 +124,7 @@ def holdings():
 @financing_blueprint.route('/holdings_update', methods=['POST'])
 def holdings_update():
     form = request.form
+    user = current_user
     ua_id = form.get('id')
     amount = float(form.get('amount')) * 100
 
@@ -137,7 +138,7 @@ def holdings_update():
         fp = FinancialProduct.query.filter_by(name=fp_name).first()
         if not fp:
             return jsonify({'code': 1, 'msg': '理财产品错误'})
-        if UserAsset.query.filter_by(agent_id=agent_id, fp=fp.id).count():
+        if UserAsset.query.filter_by(agent_id=agent_id, fp=fp.id, user_id=user.id).count():
             return jsonify({'code': 1, 'msg': '已在{}购买过{}，不要重复添加'.format(agent.name, fp.name)})
         try:
             ua = UserAsset(agent_id, fp.id, current_user.id)
@@ -153,5 +154,18 @@ def holdings_update():
             })
         except:
             logger.error('add user_asset error: {}'.format(traceback.format_exc()))
+            db.session.rollback()
+            return jsonify({'code': 1, 'msg': '系统错误'})
+    else:
+        ua = UserAsset.query.filter_by(id=ua_id, user_id=user.id).first()
+        if not ua:
+            return jsonify({'code': 1, 'msg': '持仓信息错误'})
+        try:
+            uaa = UAAmount.update(ua.id, amount)
+            ua.update_time = uaa.update_time
+            db.session.commit()
+            return jsonify({'code': 0, 'msg': ''})
+        except:
+            logger.error('update user_asset error: {}'.format(traceback.format_exc()))
             db.session.rollback()
             return jsonify({'code': 1, 'msg': '系统错误'})
