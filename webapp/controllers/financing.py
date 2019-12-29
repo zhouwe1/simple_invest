@@ -109,4 +109,5 @@ def holdings():
         'financing/holdings.html',
         uas=uas,
         fps=FinancialProduct.query.order_by(desc('id')).all(),
+        agents=Agent.query.order_by('id').all()
     )
