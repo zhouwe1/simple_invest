@@ -13,6 +13,8 @@ class UserAsset(db.Model):
     start_time = db.Column(db.DateTime(timezone=True))  # 第一次买入时间
     update_time = db.Column(db.DateTime(timezone=True), index=True)  # 最后更新时间
     user_id = db.Column(db.Integer(), db.ForeignKey('user.id', ondelete='RESTRICT'), nullable=False)
+    is_delete = db.Column(db.Boolean(), default=False)
+
     amounts = db.relationship(
         'UAAmount',
         backref='user_asset',
