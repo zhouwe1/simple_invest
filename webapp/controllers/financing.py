@@ -114,8 +114,6 @@ def fp_delete():
 def holdings():
     form = request.args
     query_dict = {'user_id': current_user.id, 'is_delete': False}
-    # if form.get('fp_type'):
-    #     query_dict['fp.type_id'] = form.get('fp_type')
 
     uas = UserAsset.query.filter_by(**query_dict)
     if form.get('fp_type'):
@@ -148,12 +146,15 @@ def holdings_update():
         fp = FinancialProduct.query.filter_by(name=fp_name).first()
         if not fp:
             return jsonify({'code': 1, 'msg': '理财产品错误'})
-        if UserAsset.query.filter_by(agent_id=agent_id, fp=fp.id, user_id=user.id).count():
+
+        ua = UserAsset.query.filter_by(agent_id=agent_id, fp=fp.id, user_id=user.id).first()
+
+        if ua and not ua.is_delete:
             return jsonify({'code': 1, 'msg': '已在{}购买过{}，不要重复添加'.format(agent.name, fp.name)})
-        try:
-            ua = UserAsset(agent_id, fp.id, current_user.id)
+        elif ua:
             uaa = UAAmount.update(ua.id, amount)
             ua.update_time = uaa.update_time
+            ua.is_delete = False
             db.session.commit()
             return jsonify({
                 'code': 0,
@@ -162,9 +163,22 @@ def holdings_update():
                 'amount': str(ua.last_amount.amount_yuan),
                 'update_time': ua.update_time_str,
             })
-        except:
-            logger.error('add user_asset error: {}'.format(traceback.format_exc()))
-            db.session.rollback()
+        else:
+            try:
+                ua = UserAsset(agent_id, fp.id, current_user.id)
+                uaa = UAAmount.update(ua.id, amount)
+                ua.update_time = uaa.update_time
+                db.session.commit()
+                return jsonify({
+                    'code': 0,
+                    'id': ua.id,
+                    'name': ua.fp_name,
+                    'amount': str(ua.last_amount.amount_yuan),
+                    'update_time': ua.update_time_str,
+                })
+            except:
+                logger.error('add user_asset error: {}'.format(traceback.format_exc()))
+                db.session.rollback()
             return jsonify({'code': 1, 'msg': '系统错误'})
     else:
         ua = UserAsset.query.filter_by(id=ua_id, user_id=user.id).first()
