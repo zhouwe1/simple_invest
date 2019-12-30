@@ -113,7 +113,7 @@ def fp_delete():
 @financing_blueprint.route('/holdings')
 def holdings():
     form = request.args
-    query_dict = {'user_id': current_user.id}
+    query_dict = {'user_id': current_user.id, 'is_delete': False}
     # if form.get('fp_type'):
     #     query_dict['fp.type_id'] = form.get('fp_type')
 
@@ -179,3 +179,13 @@ def holdings_update():
             logger.error('update user_asset error: {}'.format(traceback.format_exc()))
             db.session.rollback()
             return jsonify({'code': 1, 'msg': '系统错误'})
+
+
+@financing_blueprint.route('/holdings_delete')
+def holdings_delete():
+    ua = UserAsset.query.filter_by(id=request.args.get('id')).first()
+    uaa = UAAmount.update(ua.id, 0)
+    ua.update_time = uaa.update_time
+    ua.is_delete = True
+    db.session.commit()
+    return jsonify({'code': 0})

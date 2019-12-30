@@ -132,13 +132,12 @@ $(function () {
                     tr.find('.tr-delete').html('<i class="fa fa-spinner fa-pulse"></>');
 
                     $.ajax({
-                        url: '{{ url_for('financing.fp_delete') }}',
+                        url: '{{ url_for('financing.holdings_delete') }}',
                         type: 'GET',
                         dataType: 'json',
                         data: {'id': id},
                         success: function (r) {
                             if(r['code']==0){
-
                                 setInterval(function () {
                                 tr.remove();
                                 }, 300);
