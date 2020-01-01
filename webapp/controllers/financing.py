@@ -117,7 +117,7 @@ def holdings():
 
     uas = UserAsset.query.filter_by(**query_dict)
     if form.get('fp_type'):
-        uas = uas.join(FPType, FPType.id == form.get('fp_type')).join(FinancialProduct, FinancialProduct.type_id == FPType.id)
+        uas = uas.join(FinancialProduct).filter(FinancialProduct.type_id == form.get('fp_type'), FinancialProduct.id == UserAsset.fp)
 
     uas = uas.order_by(UserAsset.update_time.desc()).all()
     return render_template(
