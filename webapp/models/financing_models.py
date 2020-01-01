@@ -143,7 +143,7 @@ class FPAsset(db.Model):
 class FPType(db.Model):
     """
     理财产品类型
-    0其他/ 1基金/ 2股票/ 3银行理财/ 4保险理财
+    1银行存款 / 2货币基金 / 3债券基金 / 4股票基金 /  5股票 / 6银行理财 / 7保险理财 / 8黄金 / 9白银
     """
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(8), unique=True)
@@ -152,3 +152,17 @@ class FPType(db.Model):
         backref='type',
         lazy='dynamic'
     )
+
+    @staticmethod
+    def dict():
+        return {
+            1: '银行存款',
+            2: '货币基金',
+            3: '债券基金',
+            4: '股票基金',
+            5: '股票',
+            6: '银行理财',
+            7: '保险理财',
+            8: '黄金',
+            9: '白银',
+        }

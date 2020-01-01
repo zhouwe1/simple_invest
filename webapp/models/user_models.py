@@ -2,6 +2,7 @@ from webapp.extentions import db
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 from webapp.functions import public
+from .financing_models import UserAsset
 
 
 class User(db.Model, UserMixin):
@@ -39,3 +40,7 @@ class User(db.Model, UserMixin):
     def refresh_last_login(self):
         self.last_login = public.now()
         db.session.commit()
+
+    @property
+    def holdings_count(self):
+        return UserAsset.query.filter(user_id=self.id, is_delete=False).count()
