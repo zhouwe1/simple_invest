@@ -20,7 +20,7 @@
 
             <li class="nav-item has-treeview">
                 <a href="#" class="nav-link">
-                    <i class="nav-icon fas fa-chart-pie"></i>
+                    <i class="nav-icon fas fa-piggy-bank"></i>
                     <p>
                         理财
                         <i class="right fas fa-angle-left"></i>
@@ -42,10 +42,29 @@
                     <li class="nav-item">
                         <a href="{{ url_for('financing.holdings') }}" class="nav-link">
                             <i class="far fa-circle nav-icon"></i>
-                            <p>持有明细</p>
+                            <p>持仓明细</p>
                         </a>
                     </li>
                 </ul>
+            </li>
+
+            <li class="nav-item has-treeview">
+                <a href="#" class="nav-link">
+                    <i class="nav-icon fas fa-chart-pie"></i>
+                    <p>
+                        数据分析
+                        <i class="right fas fa-angle-left"></i>
+                    </p>
+                </a>
+                <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="{{ url_for('analyse.trend') }}" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>持仓走势</p>
+                        </a>
+                    </li>
+                </ul>
+            </li>
 
         </ul>
     </nav>
