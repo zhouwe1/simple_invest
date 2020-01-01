@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for, session
-from flask_login import current_user
+from flask_login import current_user, login_required
 from webapp.models.financing_models import UserAsset
 
 
@@ -10,6 +10,7 @@ analyse_blueprint = Blueprint(
 
 
 @analyse_blueprint.route('/trend')
+@login_required
 def trend():
     uas = UserAsset.query.filter_by(user_id=current_user.id, is_delete=False).order_by(UserAsset.update_time.desc()).all()
     return render_template(
@@ -19,6 +20,7 @@ def trend():
 
 
 @analyse_blueprint.route('/trend/<string:ua_id>')
+@login_required
 def trend_ua(ua_id):
     ua = UserAsset.query.filter_by(user_id=current_user.id, id=ua_id).first()
 
