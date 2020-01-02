@@ -9,6 +9,15 @@
 <div class="card">
     <div class="card-header border-0">
         <h3 class="card-title"></h3>
+
+        <div class="form-inline">
+            <select class="form-control" id="type_filter" onchange="tFilter()">
+                <option value="">按分类查看</option>
+                    {% for fp_t in fp_types %}
+                    <option value="{{ fp_t.id }}" {% if request.args.type == fp_t.id|string %}selected{% endif %}>{{ fp_t.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         <div class="card-tools">
             <button type="button" class="btn btn-success btn-md tr-clone">Add</button>
         </div>
@@ -225,5 +234,11 @@ function fpUpdate(tr) {
         }
     })
 }
+
+function tFilter() {
+    let type_id = $('#type_filter').val();
+    window.location.href = '?type=' + type_id
+}
+
 </script>
 {% endblock %}

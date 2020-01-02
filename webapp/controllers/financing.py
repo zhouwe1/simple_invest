@@ -63,7 +63,12 @@ def agent_delete():
 @financing_blueprint.route('/financial_products')
 @login_required
 def fp_index():
-    fps = FinancialProduct.query.order_by(desc('id')).all()
+    form = request.args
+    query_dict = dict()
+    if form.get('type'):
+        query_dict['type_id'] = form.get('type')
+
+    fps = FinancialProduct.query.filter_by(**query_dict).order_by(desc('id')).all()
     return render_template(
         'financing/fp_index.html',
         fps=fps,
