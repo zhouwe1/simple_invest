@@ -9,23 +9,19 @@
 <div class="card">
     <div class="card-header border-0">
         <h3 class="card-title"></h3>
-        <div class="float_left form-inline">
-            <div class="form-group">
-                <select class="form-control" id="type_filter" onchange="tFilter()">
-                    <option value="">按分类查看</option>
-                    {% for fp_t in fp_types %}
-                    <option value="{{ fp_t.id }}" {% if request.args.fp_type == fp_t.id|string %}selected{% endif %}>{{ fp_t.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>&nbsp;
-            <div class="form-group">
-                <select class="form-control" id="agent_filter" onchange="aFilter()">
-                    <option value="">按渠道查看</option>
-                    {% for agent in agents %}
-                    <option value="{{ agent.id }}" {% if request.args.agent == agent.id|string %}selected{% endif %}>{{ agent.name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+        <div class="float-left form-inline">
+            <select class="form-control" id="type_filter" onchange="tFilter()">
+                <option value="">按分类查看</option>
+                {% for fp_t in fp_types %}
+                <option value="{{ fp_t.id }}" {% if request.args.fp_type == fp_t.id|string %}selected{% endif %}>{{ fp_t.name }}</option>
+                {% endfor %}
+            </select>&nbsp;
+            <select class="form-control" id="agent_filter" onchange="aFilter()">
+                <option value="">按渠道查看</option>
+                {% for agent in agents %}
+                <option value="{{ agent.id }}" {% if request.args.agent == agent.id|string %}selected{% endif %}>{{ agent.name }}</option>
+                {% endfor %}
+            </select>
         </div>
         <div class="card-tools">
             <button type="button" class="btn btn-success btn-md tr-add">Add</button>
