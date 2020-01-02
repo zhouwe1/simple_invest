@@ -17,12 +17,14 @@ $('.tr-clone').click(function () {
 $('.tr-add').click(function () {
     let newTbody = $('#newTbody');
     if(newTbody.hasClass('d-none')){
-        $('#newTbody').removeClass('d-none');
+        newTbody.removeClass('d-none');
+        newTbody.find('input:first').focus()
     }
     else{
         newTbody.children('tr').addClass('tr-error');
         setTimeout(function(){
             newTbody.children('tr').removeClass('tr-error')
         }, 100)
+        newTbody.find('input:first').focus()
     }
 });
