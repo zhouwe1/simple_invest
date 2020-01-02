@@ -5,3 +5,4 @@ PyMySQL
 Flask-Login
 pytz
 concurrent-log-handler
+libgravatar

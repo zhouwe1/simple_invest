@@ -108,7 +108,7 @@ fp_assets = db.Table(
 class FinancialProduct(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(32), unique=True)
-    code = db.Column(db.Integer(), unique=True)  # 基金/股票 代码
+    code = db.Column(db.String(6), unique=True)  # 基金/股票 代码
     type_id = db.Column(db.Integer(), db.ForeignKey('fp_type.id', ondelete='RESTRICT'), nullable=False)
     url = db.Column(db.Text(), default='{}')
     meta = db.Column(db.Text(), default='{}')
