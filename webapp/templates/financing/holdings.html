@@ -164,7 +164,9 @@ function resetNewTbody() {
     let tbody = $('#newTbody');
     tbody.addClass('d-none');  //隐藏newTbody
     tbody.find('input').each(function () {$(this).val('')});
-    tbody.find('select').val('')
+    tbody.find('select').val('');
+    tbody.find('.tr-submit').removeAttr('disabled');
+    tbody.find('.tr-submit').text('保存');
 }
 
 function uaUpdate(tr) {

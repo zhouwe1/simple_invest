@@ -80,7 +80,7 @@ $(function () {
 
     dataTbody.on('click', '.tr-submit', function () {
         let tr = $(this).parents('tr');
-        ftUpdate(tr)
+        fpUpdate(tr)
     });
 
     dataTbody.on('click', '.tr-update', function(){
@@ -152,7 +152,8 @@ $(function () {
 });
 
 
-function ftUpdate(tr) {
+function fpUpdate(tr) {
+    // 理财产品添加或修改
     let id = tr.attr('data-id'),
         submit_btn = tr.find('.tr-submit'),
         update_btn = tr.find('.tr-update'),
