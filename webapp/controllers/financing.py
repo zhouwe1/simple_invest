@@ -115,6 +115,9 @@ def holdings():
     form = request.args
     query_dict = {'user_id': current_user.id, 'is_delete': False}
 
+    if form.get('agent'):
+        query_dict['agent_id'] = form.get('agent')
+
     uas = UserAsset.query.filter_by(**query_dict)
     if form.get('fp_type'):
         uas = uas.join(FinancialProduct).filter(FinancialProduct.type_id == form.get('fp_type'), FinancialProduct.id == UserAsset.fp)

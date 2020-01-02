@@ -9,15 +9,24 @@
 <div class="card">
     <div class="card-header border-0">
         <h3 class="card-title"></h3>
-        <div class="form-inline float-left">
-            <select class="form-control" id="type_fill" onchange="tFill()">
-                <option value="">按分类查看</option>
-                {% for fp_t in fp_types %}
-                <option value="{{ fp_t.id }}" {% if request.args.fp_type == fp_t.id|string %}selected{% endif %}>{{ fp_t.name }}</option>
-                {% endfor %}
-        </select>
+        <div class="float_left form-inline">
+            <div class="form-group">
+                <select class="form-control" id="type_filter" onchange="tFilter()">
+                    <option value="">按分类查看</option>
+                    {% for fp_t in fp_types %}
+                    <option value="{{ fp_t.id }}" {% if request.args.fp_type == fp_t.id|string %}selected{% endif %}>{{ fp_t.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>&nbsp;
+            <div class="form-group">
+                <select class="form-control" id="agent_filter" onchange="aFilter()">
+                    <option value="">按渠道查看</option>
+                    {% for agent in agents %}
+                    <option value="{{ agent.id }}" {% if request.args.agent == agent.id|string %}selected{% endif %}>{{ agent.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
         </div>
-
         <div class="card-tools">
             <button type="button" class="btn btn-success btn-md tr-add">Add</button>
         </div>
@@ -254,9 +263,14 @@ function uaUpdate(tr) {
     })
 }
 
-function tFill() {
-    let type_id = $('#type_fill').val();
+function tFilter() {
+    let type_id = $('#type_filter').val();
     window.location.href = '?fp_type=' + type_id
+}
+
+function aFilter() {
+    let type_id = $('#agent_filter').val();
+    window.location.href = '?agent=' + type_id
 }
 </script>
 {% endblock %}
