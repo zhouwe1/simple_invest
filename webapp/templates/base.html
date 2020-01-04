@@ -84,16 +84,7 @@
 <script src="{{ url_for('static', filename='js/adminlte.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/tools.js') }}"></script>
 <script type="text/javascript">
-    let current_path = window.location.pathname;
-    $('.nav-sidebar a').each(function () {
-        if(current_path==$(this).attr('href')){
-            $(this).parents('li').children('a').addClass('active');
-            $(this).parents('li.has-treeview').addClass('menu-open')
-        }
-    });
-    $(function () {
-        load_avatar('{{ session.avatar }}')
-    })
+    let user_avatar = '{{ session.avatar }}';
 </script>
 {% block footer_script %}
 {% endblock %}

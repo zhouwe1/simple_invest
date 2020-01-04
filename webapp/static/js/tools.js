@@ -1,4 +1,8 @@
-$('.tr-clone').click(function () {
+$(function () {
+    refresh_sidebar();
+    load_avatar(user_avatar);
+
+    $('.tr-clone').click(function () {
     let clone_tr = $('#dataTbody .clone-tr');
 
     if (clone_tr.length > 0){
@@ -27,7 +31,22 @@ $('.tr-add').click(function () {
     }
 });
 
+
+});
+
+
+
 function load_avatar(url) {
     $('#nav-user-avatar').prepend('<img alt src="'+ url +'" class="user-image img-circle elevation-2">');
     $('.user-header').prepend('<img src="'+ url +'" class="img-circle elevation-2" alt="User Image">')
+}
+
+function refresh_sidebar() {
+    let current_path = window.location.pathname;
+    $('.nav-sidebar a').each(function () {
+        if(current_path==$(this).attr('href')){
+            $(this).parents('li').children('a').addClass('active');
+            $(this).parents('li.has-treeview').addClass('menu-open')
+        }
+    });
 }
