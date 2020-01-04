@@ -166,8 +166,11 @@ function uaUpdate(tr) {
     }
     if(tr.find('input[name="new_fp"]').length>0){
         if(fp_list.indexOf(fp) == -1){
-            formError('理财产品错误', '请选择已有的理财产品，也可以添加新的理财产品')
+            formError('理财产品错误', '请选择已有的理财产品，没有的话请先添加')
         }
+    }
+    if(id==0 && amount=='0'){
+        formError('金额错误', '持仓金额不能为0')
     }
     if(!amount){
         formError('金额错误', '请输入持有金额')
