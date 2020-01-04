@@ -82,7 +82,7 @@ def fp_update():
     form = request.form
     fp_id = form.get('id')
     name = form.get('name')
-    fp_type = int(form.get('fp_type'))
+    fp_type = form.get('fp_type', 0, type=int)
     fp_code = form.get('fp_code') or None
 
     if FinancialProduct.query.filter(FinancialProduct.name == name, FinancialProduct.id != fp_id).count():
