@@ -6,3 +6,5 @@ Flask-Login
 pytz
 concurrent-log-handler
 libgravatar
+blinker
+cachelib

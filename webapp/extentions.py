@@ -1,10 +1,11 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_alembic import Alembic
 from flask_login import LoginManager
+from cachelib.simple import SimpleCache
 
 db = SQLAlchemy()
 alembic = Alembic()
-
+cache = SimpleCache()
 
 login_manager = LoginManager()
 login_manager.login_view = 'home.login'

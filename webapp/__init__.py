@@ -1,5 +1,6 @@
 from flask import Flask, session
 from flask_login import current_user
+from flask_sqlalchemy import models_committed
 from .extentions import db, alembic, login_manager
 from .config import Config
 from .models import *
@@ -26,3 +27,13 @@ flask_app.register_blueprint(analyse_blueprint, url_prefix='/analyse')
 def load_avatar():
     if 'user_id' in session and 'avatar' not in session:
         session['avatar'] = current_user.avatar
+
+
+@models_committed.connect_via(flask_app)
+def update_cache(sender, changes):
+    try:
+        for model, operation in changes:
+            print(model.__dict__, operation)
+            model.clear_cache()
+    except AttributeError:
+        pass

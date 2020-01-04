@@ -1,5 +1,5 @@
 from sqlalchemy import UniqueConstraint, desc
-from webapp.extentions import db
+from webapp.extentions import db, cache
 from webapp.functions.public import now as _now
 
 
@@ -96,6 +96,22 @@ class Agent(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    @staticmethod
+    def name_cache():
+        cache_key = 'agent_name'
+        if cache.get(cache_key):
+            return cache.get(cache_key)
+        name_dict = dict()
+        for agent in Agent.query.all():
+            name_dict[agent.id] = agent.name
+        cache.set(cache_key, name_dict)
+        return name_dict
+
+    @staticmethod
+    def clear_cache():
+        cache_keys = ['agent_name']
+        cache.delete_many(*cache_keys)
+
 
 fp_assets = db.Table(
     'fp_assets',
@@ -130,6 +146,22 @@ class FinancialProduct(db.Model):
         self.code = code
         db.session.add(self)
         db.session.commit()
+
+    @staticmethod
+    def name_cache():
+        cache_key = 'fp_name'
+        if cache.get(cache_key):
+            return cache.get(cache_key)
+        name_dict = dict()
+        for fp in FinancialProduct.query.all():
+            name_dict[fp.id] = fp.name
+        cache.set(cache_key, name_dict)
+        return name_dict
+
+    @staticmethod
+    def clear_cache():
+        cache_keys = ['fp_name']
+        cache.delete_many(*cache_keys)
 
 
 class FPAsset(db.Model):

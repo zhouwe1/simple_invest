@@ -27,5 +27,5 @@ class Config:
         port=try_get('database', 'port'),
         db=try_get('database', 'db')
     )
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_ECHO = False
