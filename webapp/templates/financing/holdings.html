@@ -31,10 +31,10 @@
         <table class="table table-valign-middle table-editable">
             <thead>
             <tr>
-                <th width="30%">理财产品</th>
-                <th width="20%">持有金额</th>
-                <th width="20%">更新时间</th>
-                <th width="30%">操作</th>
+                <th width="25%">理财产品</th>
+                <th width="25%">持有金额</th>
+                <th width="25%">更新时间</th>
+                <th width="25%">操作</th>
             </tr>
             </thead>
             <tbody id="newTbody" class="d-none">
@@ -99,6 +99,13 @@ $(function () {
         uaUpdate(tr)
     });
 
+
+    $('#dataTbody').on('keyup', 'input[name="amount"]', function () {
+        if(event.keyCode==13){
+            $(this).parents('tr').find('.tr-submit').click()
+        }
+    });
+
     table.on('click', '.tr-update', function(){
         let tr = $(this).parents('tr'),
             current_amount = tr.attr('data-amount');
@@ -109,7 +116,7 @@ $(function () {
         tr.find('.tr-cancel').removeClass('d-none');
 
         tr.find('.td-amount').html('<div class="form-inline"><input type="number" value="'+ current_amount +'"' +
-            ' name="amount" class="form-control" step="1" min="-99999" max="999999" autocomplete="off"></div>');
+            ' name="amount" class="form-control" step="1" min="-99999" max="99999999" autocomplete="off"></div>');
     });
 
     table.on('click', '.tr-cancel', function(){
