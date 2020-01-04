@@ -27,6 +27,7 @@
             </div>
         </div>
         <div class="card-tools">
+            <button type="button" class="btn btn-default btn-md tr-todo"><i class="fas fa-tasks"></i></button>
             <button type="button" class="btn btn-success btn-md tr-add">Add</button>
         </div>
     </div>
@@ -69,7 +70,7 @@
 
                 </tr>
             </tbody>
-            <tbody id="dataTbody">
+            <tbody id="dataTbody" data-todo="off">
             {% for ua in uas %}
                 <tr data-id="{{ ua.id }}" data-amount="{{ ua.last_amount.amount_yuan }}" data-update_time="{{ ua.last_amount.update_time }}">
                     <td>{{ ua.agent.name }}:{{ ua.financial_product.name }}</td>
@@ -157,7 +158,8 @@ function uaUpdate(tr) {
         cancel_btn = tr.find('.tr-cancel'),
         fp = tr.find('input[name="new_fp"]').val(),
         agent = tr.find('select[name="new_agent"]').val(),
-        amount = tr.find('input[name="amount"]').val();
+        amount = tr.find('input[name="amount"]').val(),
+        todo_mode = $('#dataTbody').attr('data-todo');
 
     function formError(title, msg){
         tr.addClass('tr-error');
@@ -198,19 +200,25 @@ function uaUpdate(tr) {
                 if (id==0){
                     resetNewTbody();
                     $('#dataTbody').prepend('' +
-                        '<tr data-id="'+ r['id'] +'" data-amount="'+ r['amount'] +'">' +
+                        '<tr data-id="'+ r['id'] +'" data-amount="'+ r['amount'] +'" data-update_time="'+ r['update_time'] +'">' +
                         '<td>'+ r['name'] + '</td>' +
                         '<td class="td-amount">'+ r['amount'] +'</td>' +
                         '<td class="td-update_time">'+ r['update_time'] +'</td>' +
                         '<td>' +
-                        '    <button type="button" class="btn btn-default tr-update">修改</button>' +
-                        '    <button type="button" class="btn btn-success tr-submit d-none">保存</button>' +
-                        '    <button type="button" class="btn btn-danger tr-delete">删除</button>' +
-                        '    <button type="button" class="btn btn-warning tr-cancel d-none">取消</button>' +
+                        '    <button type="button" class="btn btn-info tr-update"><i class="fas fa-pencil-alt"></i></button>' +
+                        '    <button type="button" class="btn btn-success tr-submit d-none"><i class="fa fa-check"></i></button>' +
+                        '    <button type="button" class="btn btn-warning tr-cancel d-none"><i class="fa fa-undo"></i></button>' +
                         '</td>' +
                         '</tr>')
                 }
                 else{
+                    if(todo_mode=='on'){
+                        tr.addClass('tr-success');
+                        setInterval(function () {
+                            tr.remove();
+                        }, 300);
+                        return true
+                    }
                     if(r['is_delete']){
                         tr.addClass('tr-danger');
                         setInterval(function () {
@@ -221,6 +229,8 @@ function uaUpdate(tr) {
                     setInterval(function () {
                         tr.removeClass('tr-success')
                     }, 1000);
+                    tr.attr('data-amount', r['amount']);
+                    tr.attr('data-update_time', r['update_time']);
                     tr.find('.td-amount').text(r['amount']);
                     tr.find('.td-update_time').text(r['update_time']);
                     update_btn.removeClass('d-none');
