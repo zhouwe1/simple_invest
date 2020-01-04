@@ -53,15 +53,15 @@
                          <div class="form-inline">
                              <select class="form-control" name="new_agent">
                              <option value="">购买渠道</option>
-                                 {% for agent in agents %}
-                                 <option value="{{ agent.id }}">{{ agent.name }}</option>
+                                 {% for agent_id, agent_name in agents.items() %}
+                                 <option value="{{ agent_id }}">{{ agent_name }}</option>
                                  {% endfor %}
                              </select>
                          </div>
                     </td>
                     <td>
                         <button type="button" class="btn btn-success tr-submit"><i class="fa fa-check"></i></button>
-                        <button type="button" class="btn btn-danger tr-delete"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn btn-warning tr-cancel"><i class="fa fa-undo"></i></button>
                     </td>
 
                 </tr>
@@ -75,7 +75,6 @@
                     <td>
                         <button type="button" class="btn btn-info tr-update"><i class="fas fa-pencil-alt"></i></button>
                         <button type="button" class="btn btn-success tr-submit d-none"><i class="fa fa-check"></i></button>
-                        <button type="button" class="btn btn-danger tr-delete"><i class="fas fa-trash"></i></button>
                         <button type="button" class="btn btn-warning tr-cancel d-none"><i class="fa fa-undo"></i></button>
                     </td>
                 </tr>
@@ -99,7 +98,6 @@ $(function () {
         uaUpdate(tr)
     });
 
-
     $('#dataTbody').on('keyup', 'input[name="amount"]', function () {
         if(event.keyCode==13){
             $(this).parents('tr').find('.tr-submit').click()
@@ -112,7 +110,6 @@ $(function () {
 
         tr.find('.tr-update').addClass('d-none');
         tr.find('.tr-submit').removeClass('d-none');
-        tr.find('.tr-delete').addClass('d-none');
         tr.find('.tr-cancel').removeClass('d-none');
 
         tr.find('.td-amount').html('<div class="form-inline"><input type="number" value="'+ current_amount +'"' +
@@ -121,49 +118,18 @@ $(function () {
 
     table.on('click', '.tr-cancel', function(){
         let tr = $(this).parents('tr'),
+            id=tr.attr('data-id'),
             amount = tr.attr('data-amount'),
             amount_td = tr.find('.td-amount');
+        if(id=='0'){
+            resetNewTbody();
+            return false
+        }
+
         amount_td.text(amount);
         tr.find('.tr-update').removeClass('d-none');
         tr.find('.tr-submit').addClass('d-none');
-        tr.find('.tr-delete').removeClass('d-none');
         tr.find('.tr-cancel').addClass('d-none');
-    });
-
-    table.on('click', '.tr-delete', function () {
-        let tr =$(this).parents('tr'),
-            id = tr.attr('data-id');
-        if(id=='0'){
-            resetNewTbody()
-        }
-        else{
-            tr.addClass('tr-danger');
-            bootbox.confirm('确认删除吗？', function (result) {
-                if(result){
-                    tr.find('.tr-delete').attr('disabled', 'disabled');
-                    tr.find('.tr-delete').html('<i class="fa fa-spinner fa-pulse"></>');
-
-                    $.ajax({
-                        url: '{{ url_for('financing.holdings_delete') }}',
-                        type: 'GET',
-                        dataType: 'json',
-                        data: {'id': id},
-                        success: function (r) {
-                            if(r['code']==0){
-                                setInterval(function () {
-                                tr.remove();
-                                }, 300);
-                            }
-                        }
-
-                    })
-                }
-                else{
-                    tr.removeClass('tr-danger')
-                }
-            })
-        }
-
     });
 
     $('input[name="new_fp"]').autocomplete({
@@ -174,11 +140,10 @@ $(function () {
 
 function resetNewTbody() {
     let tbody = $('#newTbody');
-    tbody.addClass('d-none');  //隐藏newTbody
+    tbody.addClass('d-none');  {# 隐藏newTbody #}
     tbody.find('input').each(function () {$(this).val('')});
     tbody.find('select').val('');
     tbody.find('.tr-submit').removeAttr('disabled');
-    tbody.find('.tr-submit').html('<i class="fa fa-check"></i>');
 }
 
 function uaUpdate(tr) {
@@ -187,7 +152,6 @@ function uaUpdate(tr) {
         submit_btn = tr.find('.tr-submit'),
         update_btn = tr.find('.tr-update'),
         cancel_btn = tr.find('.tr-cancel'),
-        delete_btn = tr.find('.tr-delete'),
         fp = tr.find('input[name="new_fp"]').val(),
         agent = tr.find('select[name="new_agent"]').val(),
         amount = tr.find('input[name="amount"]').val();
@@ -215,8 +179,8 @@ function uaUpdate(tr) {
     }
     if(error_ct>0){return false}
 
-    submit_btn.html('<i class="fa fa-spinner fa-pulse"></>');  //把保存按钮改成loading图标
-    submit_btn.attr('disabled', 'disabled');  //保存按钮disabled
+    submit_btn.html('<i class="fa fa-spinner fa-pulse"></>');  {# 把保存按钮改成loading图标 #}
+    submit_btn.attr('disabled', 'disabled');  {# 禁用保存按钮 #}
 
     $.ajax({
         url: '{{ url_for('financing.holdings_update') }}',
@@ -249,9 +213,8 @@ function uaUpdate(tr) {
                     tr.find('.td-update_time').text(r['update_time']);
                     update_btn.removeClass('d-none');
                     cancel_btn.addClass('d-none');
-                    delete_btn.removeClass('d-none');
                     tr.removeClass('clone-tr');
-                    submit_btn.addClass('d-none');  //隐藏保存按钮
+                    submit_btn.addClass('d-none');  {# 隐藏保存按钮 #}
                     submit_btn.html('<i class="fa fa-check"></i>');
                     submit_btn.removeAttr('disabled');
                 }
@@ -259,7 +222,7 @@ function uaUpdate(tr) {
             }
             else{
                 formError('发生错误', r['msg']);
-                submit_btn.html('<i class="fa fa-check"></i>');
+                submit_btn.html('<i class="fa fa-check"></i>');{# 恢复保存按钮 #}
                 submit_btn.removeAttr('disabled');
             }
         }
