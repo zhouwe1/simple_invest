@@ -91,6 +91,9 @@
             $(this).parents('li.has-treeview').addClass('menu-open')
         }
     });
+    $(function () {
+        load_avatar('{{ session.avatar }}')
+    })
 </script>
 {% block footer_script %}
 {% endblock %}

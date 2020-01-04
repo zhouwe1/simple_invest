@@ -37,14 +37,12 @@
 
     <!-- Notifications Dropdown Menu -->
     <li class="nav-item dropdown user-menu">
-        <a href="#" class="nav-link" data-toggle="dropdown">
-            <img alt src="{{ session.avatar }}" class="user-image img-circle elevation-2">
+        <a href="#" class="nav-link" data-toggle="dropdown" id="nav-user-avatar">
             <span class="d-none d-md-inline">{{ current_user.username }}</span>
         </a>
         <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
             <!-- User image -->
             <li class="user-header bg-default">
-                <img src="{{ session.avatar }}" class="img-circle elevation-2" alt="User Image">
                 <p>
                     {{ current_user.username }}
                     <small>Member since {{ current_user.join_date }}</small>

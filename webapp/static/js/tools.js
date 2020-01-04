@@ -1,5 +1,3 @@
-
-
 $('.tr-clone').click(function () {
     let clone_tr = $('#dataTbody .clone-tr');
 
@@ -24,7 +22,12 @@ $('.tr-add').click(function () {
         newTbody.children('tr').addClass('tr-error');
         setTimeout(function(){
             newTbody.children('tr').removeClass('tr-error')
-        }, 100)
+        }, 100);
         newTbody.find('input:first').focus()
     }
 });
+
+function load_avatar(url) {
+    $('#nav-user-avatar').prepend('<img alt src="'+ url +'" class="user-image img-circle elevation-2">');
+    $('.user-header').prepend('<img src="'+ url +'" class="img-circle elevation-2" alt="User Image">')
+}
