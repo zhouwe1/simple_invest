@@ -94,7 +94,7 @@
                     <tr>
                         <td>{{ fpt.name }}</td>
                         <td>{{ fpt.count }}</td>
-                        <td>{{ fpt.amount }}</td>
+                        <td>{{ fpt.amount | round(2, 'ceil')  }}</td>
                         <td>{{ fpt.amount_rate }}</td>
                     </tr>
                     {% endfor %}
