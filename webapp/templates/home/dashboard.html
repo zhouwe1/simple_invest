@@ -139,7 +139,7 @@ function fill_agent_pie(){
             labels: [{% for k, v in agent_tuples %}'{{ k }}',{% endfor %}],
             datasets: [{
                 data: [{% for k, v in agent_tuples %}'{{ v }}',{% endfor %}],
-                backgroundColor: ['#3682be','#45a776','#f05326','#334f65','#eed777', '#b3974e','#38cb7d','#ddae33'],
+                backgroundColor: ['#e75840','#a565ef','#628cee','#eb9358','#d05c7c','#bb60b2','#433e7c'],
             }]
         },
         pieChartCanvas = $('#agentChart').get(0).getContext('2d');
