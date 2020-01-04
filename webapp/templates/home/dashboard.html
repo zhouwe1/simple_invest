@@ -69,78 +69,94 @@
 </div>
 
 <div class="row">
-    <div class="col-lg-6 col-sm-12">
+    <div class="col-lg-4 col-sm-12">
         <div class="card">
-            <div class="card-header border-0">
-                <h3 class="card-title">持仓类型</h3>
-                <div class="card-tools">
-                    <a href="#" class="btn btn-tool btn-sm">
-                        <i class="fas fa-bars"></i>
-                    </a>
-                </div>
+            <div class="card-header">
+                <h3 class="card-title">渠道占比</h3>
             </div>
-            <div class="card-body table-responsive p-0">
-                <table class="table table-valign-middle">
-                    <thead>
-                        <tr>
-                            <th>类型</th>
-                            <th>持仓数量</th>
-                            <th>持仓金额</th>
-                            <th>持仓金额占比</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for fpt in fpt_list %}
-                    <tr>
-                        <td>{{ fpt.name }}</td>
-                        <td>{{ fpt.count }}</td>
-                        <td>{{ fpt.amount | round(2, 'ceil')  }}</td>
-                        <td>{{ fpt.amount_rate }}</td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
+            <!-- /.card-header -->
+            <div class="card-body">
+                    <div class="chart-responsive">
+                        <canvas id="agentChart" height="200"></canvas>
+                    </div>
+                    <!-- ./chart-responsive -->
+            </div>
+            <!-- /.card-body -->
+        </div>
+        <!-- /.card -->
+    </div>
 
-          </div>
-        </div>
-    </div>
-    <div class="col-lg-6 col-sm-12">
+    <div class="col-lg-4 col-sm-12">
         <div class="card">
-            <div class="card-header border-0">
-                <h3 class="card-title">理财渠道</h3>
-                <div class="card-tools">
-                    <a href="#" class="btn btn-tool btn-sm">
-                        <i class="fas fa-bars"></i>
-                    </a>
-                </div>
+            <div class="card-header">
+                <h3 class="card-title">类型占比</h3>
             </div>
-            <div class="card-body table-responsive p-0">
-                <table class="table table-valign-middle">
-                    <thead>
-                        <tr>
-                            <th>渠道名称</th>
-                            <th>持仓数量</th>
-                            <th>持仓金额</th>
-                            <th>持仓金额占比</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for agent in agent_list %}
-                    <tr>
-                        <td>{{ agent.name }}</td>
-                        <td>{{ agent.count }}</td>
-                        <td>{{ agent.amount | round(2, 'ceil') }}</td>
-                        <td>{{ agent.amount_rate }}</td>
-                    </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-          </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+                    <div class="chart-responsive">
+                        <canvas id="fptypeChart" height="200"></canvas>
+                    </div>
+                    <!-- ./chart-responsive -->
+            </div>
+            <!-- /.card-body -->
         </div>
+        <!-- /.card -->
     </div>
+
 
 </div>
 
-<!-- /.card -->
 
+
+{% endblock %}
+
+
+{% block footer_script %}
+<script type="text/javascript">
+let pieOptions = {
+    maintainAspectRatio : false,
+    responsive : true,
+    legend: {
+      position: 'right'
+    }
+};
+
+$(function () {
+    fill_agent_pie();
+    fill_fptype_pie();
+});
+
+function fill_agent_pie(){
+    let agentData = {
+            labels: [{% for k, v in agent_tuples %}'{{ k }}',{% endfor %}],
+            datasets: [{
+                data: [{% for k, v in agent_tuples %}'{{ v }}',{% endfor %}],
+                backgroundColor : ['#3b6291','#943c39','#779043','#624c7c','#388498'],
+            }]
+        },
+        pieChartCanvas = $('#agentChart').get(0).getContext('2d'),
+        pieChart = new Chart(pieChartCanvas, {
+            type: 'doughnut',
+            data: agentData,
+            options: pieOptions
+        });
+}
+
+function fill_fptype_pie(){
+    let agentData = {
+            labels: [{% for k, v in fptype_tuples %}'{{ k }}',{% endfor %}],
+            datasets: [{
+                data: [{% for k, v in agent_tuples %}'{{ v }}',{% endfor %}],
+                backgroundColor :['#63b2ee', '#76da91', '#f8cb7f', '#f89588','#7cd6cf','#9192ab','#7898e1','#efa666','#eddd86','#9987ce','#63b2ee','#76da91'],
+
+            }]
+        },
+        pieChartCanvas = $('#fptypeChart').get(0).getContext('2d'),
+        pieChart = new Chart(pieChartCanvas, {
+            type: 'doughnut',
+            data: agentData,
+            options: pieOptions
+        });
+}
+</script>
 {% endblock %}
