@@ -129,7 +129,7 @@
                     <tr>
                         <td>{{ agent.name }}</td>
                         <td>{{ agent.count }}</td>
-                        <td>{{ agent.amount }}</td>
+                        <td>{{ agent.amount | round(2, 'ceil') }}</td>
                         <td>{{ agent.amount_rate }}</td>
                     </tr>
                     {% endfor %}
