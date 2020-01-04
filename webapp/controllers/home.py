@@ -71,6 +71,7 @@ def register():
 @home_blueprint.route('/logout')
 @login_required
 def logout():
+    session.pop('avatar', '')
     logout_user()
     return redirect(url_for('home.login'))
 
