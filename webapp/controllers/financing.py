@@ -145,6 +145,7 @@ def holdings_update():
     amount = float(form.get('amount')) * 100
 
     if ua_id == '0':
+        # 走新增接口进来的，添加新的持仓记录，或者恢复已删除的记录
         agent_id = form.get('agent')
         fp_name = form.get('fp')
 
@@ -158,8 +159,10 @@ def holdings_update():
         ua = UserAsset.query.filter_by(agent_id=agent_id, fp=fp.id, user_id=user.id).first()
 
         if ua and not ua.is_delete:
+            # 存在相同理财产品，相同渠道，未删除的记录
             return jsonify({'code': 1, 'msg': '已在{}购买过{}，不要重复添加'.format(agent.name, fp.name)})
         elif ua:
+            # 存在相同理财产品，相同渠道，已删除的记录
             uaa = UAAmount.update(ua.id, amount)
             ua.update_time = uaa.update_time
             ua.is_delete = False
@@ -172,6 +175,7 @@ def holdings_update():
                 'update_time': ua.update_time_str,
             })
         else:
+            # 添加新纪录
             try:
                 ua = UserAsset(agent_id, fp.id, current_user.id)
                 uaa = UAAmount.update(ua.id, amount)
@@ -189,25 +193,18 @@ def holdings_update():
                 db.session.rollback()
             return jsonify({'code': 1, 'msg': '系统错误'})
     else:
+        # 走更新接口进来
         ua = UserAsset.query.filter_by(id=ua_id, user_id=user.id).first()
         if not ua:
             return jsonify({'code': 1, 'msg': '持仓信息错误'})
         try:
             uaa = UAAmount.update(ua.id, amount)
             ua.update_time = uaa.update_time
+            if not amount:
+                ua.is_delete = True
             db.session.commit()
-            return jsonify({'code': 0, 'amount': str(ua.last_amount.amount_yuan), 'update_time': ua.update_time_str})
+            return jsonify({'code': 0, 'amount': str(ua.last_amount.amount_yuan), 'update_time': ua.update_time_str, 'is_delete': ua.is_delete})
         except:
             logger.error('update user_asset error: {}'.format(traceback.format_exc()))
             db.session.rollback()
             return jsonify({'code': 1, 'msg': '系统错误'})
-
-
-@financing_blueprint.route('/holdings_delete')
-def holdings_delete():
-    ua = UserAsset.query.filter_by(id=request.args.get('id')).first()
-    uaa = UAAmount.update(ua.id, 0)
-    ua.update_time = uaa.update_time
-    ua.is_delete = True
-    db.session.commit()
-    return jsonify({'code': 0})

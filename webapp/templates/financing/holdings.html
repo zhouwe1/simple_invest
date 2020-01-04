@@ -208,6 +208,12 @@ function uaUpdate(tr) {
                         '</tr>')
                 }
                 else{
+                    if(r['is_delete']){
+                        tr.addClass('tr-danger');
+                        setInterval(function () {
+                            tr.remove();
+                        }, 300);
+                    }
                     tr.addClass('tr-success');
                     setInterval(function () {
                         tr.removeClass('tr-success')
