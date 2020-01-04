@@ -44,6 +44,12 @@ class UserAsset(db.Model):
     def update_time_str(self):
         return self.update_time.strftime("%Y-%m-%d %H:%M:%S")
 
+    @staticmethod
+    def clear_cache(model, operation):
+        cache_keys = []
+        print('UserAsset', model)
+        pass
+
 
 class UAAmount(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
@@ -80,6 +86,12 @@ class UAAmount(db.Model):
             uaa = UAAmount(ua_id, amount, now)
         return uaa
 
+    @staticmethod
+    def clear_cache(model, operation):
+        cache_keys = []
+        print('UAAmount', model)
+        pass
+
 
 class Agent(db.Model):
     """购买处(银行/基金公司/支付宝/微信)"""
@@ -108,9 +120,24 @@ class Agent(db.Model):
         return name_dict
 
     @staticmethod
-    def clear_cache():
+    def clear_cache(model, operation):
         cache_keys = ['agent_name']
         cache.delete_many(*cache_keys)
+
+    @staticmethod
+    def user_cache(user_id):
+        cache_key = 'agent_user_{}'.format(user_id)
+        if cache.get(cache_key):
+            return cache.get(cache_key)
+        user_dict = dict()
+        for agent in Agent.query.join(UserAsset).filter(
+                Agent.id == UserAsset.agent_id,
+                UserAsset.user_id == user_id,
+                UserAsset.is_delete == 0,
+        ).distinct().order_by(Agent.id).all():
+            user_dict[agent.id] = agent.name
+        cache.set(cache_key, user_dict)
+        return user_dict
 
 
 fp_assets = db.Table(
@@ -159,7 +186,7 @@ class FinancialProduct(db.Model):
         return name_dict
 
     @staticmethod
-    def clear_cache():
+    def clear_cache(model, operation):
         cache_keys = ['fp_name']
         cache.delete_many(*cache_keys)
 

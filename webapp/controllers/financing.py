@@ -132,7 +132,7 @@ def holdings():
         'financing/holdings.html',
         uas=uas,
         fps=FinancialProduct.query.order_by(desc('id')).all(),
-        agents=Agent.name_cache(),
+        agents=Agent.user_cache(current_user.id),
         fp_types=FPType.dict(),
     )
 

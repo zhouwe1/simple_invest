@@ -33,6 +33,6 @@ def load_avatar():
 def update_cache(sender, changes):
     try:
         for model, operation in changes:
-            model.clear_cache()
+            model.clear_cache(model, operation)
     except AttributeError:
         pass
