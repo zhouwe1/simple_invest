@@ -102,7 +102,7 @@ class Agent(db.Model):
         if cache.get(cache_key):
             return cache.get(cache_key)
         name_dict = dict()
-        for agent in Agent.query.all():
+        for agent in Agent.query.order_by('id').all():
             name_dict[agent.id] = agent.name
         cache.set(cache_key, name_dict)
         return name_dict

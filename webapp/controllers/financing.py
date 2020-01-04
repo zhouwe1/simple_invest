@@ -72,7 +72,7 @@ def fp_index():
     return render_template(
         'financing/fp_index.html',
         fps=fps,
-        fp_types=FPType.query.order_by('id').all(),
+        fp_types=FPType.dict(),
     )
 
 
@@ -132,8 +132,8 @@ def holdings():
         'financing/holdings.html',
         uas=uas,
         fps=FinancialProduct.query.order_by(desc('id')).all(),
-        agents=Agent.query.order_by('id').all(),
-        fp_types=FPType.query.order_by('id').all(),
+        agents=Agent.name_cache(),
+        fp_types=FPType.dict(),
     )
 
 

@@ -33,7 +33,6 @@ def load_avatar():
 def update_cache(sender, changes):
     try:
         for model, operation in changes:
-            print(model.__dict__, operation)
             model.clear_cache()
     except AttributeError:
         pass

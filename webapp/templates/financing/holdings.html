@@ -12,14 +12,14 @@
         <div class="float-left form-inline">
             <select class="form-control" id="type_filter" onchange="tFilter()">
                 <option value="">按分类查看</option>
-                {% for fp_t in fp_types %}
-                <option value="{{ fp_t.id }}" {% if request.args.fp_type == fp_t.id|string %}selected{% endif %}>{{ fp_t.name }}</option>
+                {% for fpt_id, fpt_name in fp_types.items() %}
+                <option value="{{ fpt_id }}" {% if request.args.fp_type == fpt_id|string %}selected{% endif %}>{{ fpt_name }}</option>
                 {% endfor %}
             </select>&nbsp;
             <select class="form-control" id="agent_filter" onchange="aFilter()">
                 <option value="">按渠道查看</option>
-                {% for agent in agents %}
-                <option value="{{ agent.id }}" {% if request.args.agent == agent.id|string %}selected{% endif %}>{{ agent.name }}</option>
+                {% for agent_id, agent_name in agents.items() %}
+                <option value="{{ agent_id }}" {% if request.args.agent == agent_id|string %}selected{% endif %}>{{ agent_name }}</option>
                 {% endfor %}
             </select>
         </div>
