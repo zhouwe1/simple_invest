@@ -60,8 +60,8 @@
                          </div>
                     </td>
                     <td>
-                        <button type="button" class="btn btn-success tr-submit">保存</button>
-                        <button type="button" class="btn btn-danger tr-delete">删除</button>
+                        <button type="button" class="btn btn-success tr-submit"><i class="fa fa-check"></i></button>
+                        <button type="button" class="btn btn-danger tr-delete"><i class="fas fa-trash"></i></button>
                     </td>
 
                 </tr>
@@ -73,10 +73,10 @@
                     <td class="td-amount">{{ ua.last_amount.amount_yuan }}</td>
                     <td class="td-update_time">{{ ua.last_amount.update_time }}</td>
                     <td>
-                        <button type="button" class="btn btn-default tr-update">修改</button>
-                        <button type="button" class="btn btn-success tr-submit d-none">保存</button>
-                        <button type="button" class="btn btn-danger tr-delete">删除</button>
-                        <button type="button" class="btn btn-warning tr-cancel d-none">取消</button>
+                        <button type="button" class="btn btn-info tr-update"><i class="fas fa-pencil-alt"></i></button>
+                        <button type="button" class="btn btn-success tr-submit d-none"><i class="fa fa-check"></i></button>
+                        <button type="button" class="btn btn-danger tr-delete"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn btn-warning tr-cancel d-none"><i class="fa fa-undo"></i></button>
                     </td>
                 </tr>
             {% endfor %}
@@ -178,7 +178,7 @@ function resetNewTbody() {
     tbody.find('input').each(function () {$(this).val('')});
     tbody.find('select').val('');
     tbody.find('.tr-submit').removeAttr('disabled');
-    tbody.find('.tr-submit').text('保存');
+    tbody.find('.tr-submit').html('<i class="fa fa-check"></i>');
 }
 
 function uaUpdate(tr) {
@@ -252,14 +252,14 @@ function uaUpdate(tr) {
                     delete_btn.removeClass('d-none');
                     tr.removeClass('clone-tr');
                     submit_btn.addClass('d-none');  //隐藏保存按钮
-                    submit_btn.text('提交');
+                    submit_btn.html('<i class="fa fa-check"></i>');
                     submit_btn.removeAttr('disabled');
                 }
 
             }
             else{
                 formError('发生错误', r['msg']);
-                submit_btn.text('提交');
+                submit_btn.html('<i class="fa fa-check"></i>');
                 submit_btn.removeAttr('disabled');
             }
         }

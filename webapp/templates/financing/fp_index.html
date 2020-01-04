@@ -26,10 +26,10 @@
         <table class="table table-valign-middle">
             <thead>
             <tr>
-                <th width="40%">名称</th>
+                <th width="35%">名称</th>
                 <th width="20%">类型</th>
                 <th width="10%">代码</th>
-                <th width="30%">操作</th>
+                <th width="35%">操作</th>
             </tr>
             </thead>
             <tbody id="dataTbody">
@@ -39,10 +39,10 @@
                     <td>{{ fp.type.name }}</td>
                     <td>{{ fp.code|default('', True) }}</td>
                     <td>
-                        <button type="button" class="btn btn-default tr-update">修改</button>
-                        <button type="button" class="btn btn-success tr-submit d-none">保存</button>
-                        <button type="button" class="btn btn-danger tr-delete">删除</button>
-                        <button type="button" class="btn btn-warning tr-cancel d-none">取消</button>
+                        <button type="button" class="btn btn-info tr-update"><i class="fas fa-pencil-alt"></i></button>
+                        <button type="button" class="btn btn-success tr-submit d-none"><i class="fa fa-check"></i></button>
+                        <button type="button" class="btn btn-danger tr-delete"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn btn-warning tr-cancel d-none"><i class="fa fa-undo"></i></button>
                     </td>
                 </tr>
             {% endfor %}
@@ -67,10 +67,10 @@
                         </div>
                     </td>
                     <td>
-                        <button type="button" class="btn btn-default tr-update d-none">修改</button>
-                        <button type="button" class="btn btn-success tr-submit">保存</button>
-                        <button type="button" class="btn btn-danger tr-delete">删除</button>
-                        <button type="button" class="btn btn-warning tr-cancel d-none">取消</button>
+                        <button type="button" class="btn btn-info tr-update d-none"><i class="fas fa-pencil-alt"></i></button>
+                        <button type="button" class="btn btn-success tr-submit"><i class="fa fa-check"></i></button>
+                        <button type="button" class="btn btn-danger tr-delete"><i class="fas fa-trash"></i></button>
+                        <button type="button" class="btn btn-warning tr-cancel d-none"><i class="fa fa-undo"></i></button>
                     </td>
 
                 </tr>
@@ -144,7 +144,7 @@ $(function () {
                                 setInterval(function () {
                                     tr.removeClass('tr-error');
                                 }, 300);
-                                tr.find('.tr-delete').html('删除');
+                                tr.find('.tr-delete').html('<i class="fas fa-trash"></i>');
                                 tr.find('.tr-delete').removeAttr('disabled');
                             }
                         }
