@@ -123,7 +123,7 @@ def dashboard():
         target=400000,
         target_rate=round(total_amount/target * 100, 1),
         fp_count=fp_count,
-        total_amount=total_amount,
+        total_amount=round(total_amount, 2),
         last_update=last_update,
         agent_tuples=agent_tuples,
         fptype_tuples=fptype_tuples
