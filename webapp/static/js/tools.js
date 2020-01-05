@@ -65,12 +65,23 @@ $(function () {
 });
 
 let pieOptions = {
-    maintainAspectRatio : false,
-    responsive : true,
-    legend: {
-      position: 'right'
-    }
-};
+        maintainAspectRatio : false,
+        responsive : true,
+        legend: {position: 'right'}
+    },
+    areaChartOptions = {
+        maintainAspectRatio : false,
+        responsive : true,
+        legend: {display: false},
+        scales: {
+            xAxes: [{
+                gridLines : {display : false}
+            }],
+            yAxes: [{
+                gridLines : {display : false}
+            }]
+        }
+    };
 
 
 function load_avatar(url) {
@@ -118,4 +129,36 @@ function fill_dashboard_fptype_pie(labels, datas){
         data: agentData,
         options: pieOptions
     });
+}
+
+function uaTrendChart(url) {
+    $.ajax({
+        url: url,
+        type: 'GET',
+        dataType: 'json',
+        success: function(r){
+            let areaChartCanvas = $('#uaTrend').get(0).getContext('2d');
+            $("html,body").animate({scrollTop:$("#uaTrend").offset().top},1000);
+            let areaChartData = {
+                labels  : r['labels'],
+                datasets: [
+                    {
+                        backgroundColor     : 'rgba(60,141,188,0.9)',
+                        borderColor         : 'rgba(60,141,188,0.8)',
+                        pointRadius          : false,
+                        pointColor          : '#3b8bba',
+                        pointStrokeColor    : 'rgba(60,141,188,1)',
+                        pointHighlightFill  : '#fff',
+                        pointHighlightStroke: 'rgba(60,141,188,1)',
+                        data                : r['datas']
+                    },
+                ]
+            };
+            new Chart(areaChartCanvas, {
+                type: 'line',
+                data: areaChartData,
+                options: areaChartOptions
+            })
+        },
+    })
 }

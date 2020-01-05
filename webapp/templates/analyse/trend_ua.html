@@ -32,54 +32,13 @@
 {% block footer_script %}
 <script type="text/javascript">
 $(function () {
-    let areaChartOptions = {
-      maintainAspectRatio : false,
-      responsive : true,
-        legend: {display: false},
-        scales: {
-          xAxes: [{
-              gridLines : {display : false}
-          }],
-            yAxes: [{
-              gridLines : {display : false}
-          }]
-      }
-    };
-    let areaChartCanvas = $('#uaTrend').get(0).getContext('2d');
+
 
     $('#uaFilter').change(function () {
-        let ua_id = $(this).val();
-        $.ajax({
-            url: '{{ url_for('analyse.trend_ua_detail', ua_id=0) }}'.replace(0, ua_id),
-            type: 'GET',
-            dataType: 'json',
-            success: function(r){
-
-                $("html,body").animate({scrollTop:$("#uaTrend").offset().top},1000);
-                let areaChartData = {
-                    labels  : r['labels'],
-                    datasets: [
-                        {
-                            backgroundColor     : 'rgba(60,141,188,0.9)',
-                            borderColor         : 'rgba(60,141,188,0.8)',
-                            pointRadius          : false,
-                            pointColor          : '#3b8bba',
-                            pointStrokeColor    : 'rgba(60,141,188,1)',
-                            pointHighlightFill  : '#fff',
-                            pointHighlightStroke: 'rgba(60,141,188,1)',
-                            data                : r['datas']
-                        },
-                    ]
-                };
-                let areaChart = new Chart(areaChartCanvas, {
-                    type: 'line',
-                    data: areaChartData,
-                    options: areaChartOptions
-                })
-            },
-        })
+        let ua_id = $(this).val(),
+            url = '{{ url_for('analyse.trend_ua_detail', ua_id=0) }}'.replace(0, ua_id);
+        uaTrendChart(url)
     });
-
 });
 
 </script>
