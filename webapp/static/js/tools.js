@@ -57,9 +57,20 @@ $(function () {
             })
         }
 
+    });
+
+    $('.dashboard-pie-view-detail').click(function () {
+        window.location.href='/analyse/scale'
     })
 });
 
+let pieOptions = {
+    maintainAspectRatio : false,
+    responsive : true,
+    legend: {
+      position: 'right'
+    }
+};
 
 
 function load_avatar(url) {
@@ -74,5 +85,37 @@ function refresh_sidebar() {
             $(this).parents('li').children('a').addClass('active');
             $(this).parents('li.has-treeview').addClass('menu-open')
         }
+    });
+}
+
+function fill_dashboard_agent_pie(labels, datas){
+    let agentData = {
+            labels: labels,
+            datasets: [{
+                data: datas,
+                backgroundColor: ['#e75840','#a565ef','#628cee','#eb9358','#d05c7c','#bb60b2','#433e7c'],
+            }]
+        },
+        pieChartCanvas = $('#agentChart').get(0).getContext('2d');
+    new Chart(pieChartCanvas, {
+        type: 'doughnut',
+        data: agentData,
+        options: pieOptions
+    });
+}
+
+function fill_dashboard_fptype_pie(labels, datas){
+    let agentData = {
+            labels: labels,
+            datasets: [{
+                data: datas,
+                backgroundColor: ['#63b2ee', '#76da91', '#f8cb7f', '#f89588','#7cd6cf','#9192ab','#7898e1','#efa666','#eddd86','#9987ce','#63b2ee','#76da91'],
+            }]
+        },
+        pieChartCanvas = $('#fptypeChart').get(0).getContext('2d');
+    new Chart(pieChartCanvas, {
+        type: 'doughnut',
+        data: agentData,
+        options: pieOptions
     });
 }

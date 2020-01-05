@@ -74,7 +74,7 @@
             <div class="card-header">
                 <h3 class="card-title">渠道占比</h3>
                 <div class="card-tools">
-                    <button type="button" class="btn btn-tool" title="查看详情">
+                    <button type="button" class="btn btn-tool dashboard-pie-view-detail" title="查看详情">
                       <i class="fas fa-list"></i>
                     </button>
                 </div>
@@ -96,7 +96,7 @@
             <div class="card-header">
                 <h3 class="card-title">类型占比</h3>
                 <div class="card-tools">
-                    <button type="button" class="btn btn-tool" title="查看详情">
+                    <button type="button" class="btn btn-tool dashboard-pie-view-detail" title="查看详情">
                       <i class="fas fa-list"></i>
                   </button>
                 </div>
@@ -121,49 +121,9 @@
 
 {% block footer_script %}
 <script type="text/javascript">
-let pieOptions = {
-    maintainAspectRatio : false,
-    responsive : true,
-    legend: {
-      position: 'right'
-    }
-};
-
 $(function () {
-    fill_agent_pie();
-    fill_fptype_pie();
+    fill_dashboard_agent_pie([{% for k, v in agent_tuples %}'{{ k }}',{% endfor %}], [{% for k, v in agent_tuples %}'{{ v }}',{% endfor %}]);
+    fill_dashboard_fptype_pie([{% for k, v in fptype_tuples %}'{{ k }}',{% endfor %}], [{% for k, v in fptype_tuples %}'{{ v }}',{% endfor %}]);
 });
-
-function fill_agent_pie(){
-    let agentData = {
-            labels: [{% for k, v in agent_tuples %}'{{ k }}',{% endfor %}],
-            datasets: [{
-                data: [{% for k, v in agent_tuples %}'{{ v }}',{% endfor %}],
-                backgroundColor: ['#e75840','#a565ef','#628cee','#eb9358','#d05c7c','#bb60b2','#433e7c'],
-            }]
-        },
-        pieChartCanvas = $('#agentChart').get(0).getContext('2d');
-    new Chart(pieChartCanvas, {
-        type: 'doughnut',
-        data: agentData,
-        options: pieOptions
-    });
-}
-
-function fill_fptype_pie(){
-    let agentData = {
-            labels: [{% for k, v in fptype_tuples %}'{{ k }}',{% endfor %}],
-            datasets: [{
-                data: [{% for k, v in fptype_tuples %}'{{ v }}',{% endfor %}],
-                backgroundColor: ['#63b2ee', '#76da91', '#f8cb7f', '#f89588','#7cd6cf','#9192ab','#7898e1','#efa666','#eddd86','#9987ce','#63b2ee','#76da91'],
-            }]
-        },
-        pieChartCanvas = $('#fptypeChart').get(0).getContext('2d');
-    new Chart(pieChartCanvas, {
-        type: 'doughnut',
-        data: agentData,
-        options: pieOptions
-    });
-}
 </script>
 {% endblock %}
