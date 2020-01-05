@@ -20,7 +20,7 @@
             <div class="form-group">
                 <select class="form-control" id="agent_filter" onchange="aFilter()">
                     <option value="">按渠道</option>
-                    {% for agent_id, agent_name in agents.items() %}
+                    {% for agent_id, agent_name in user_agents.items() %}
                     <option value="{{ agent_id }}" {% if request.args.agent == agent_id|string %}selected{% endif %}>{{ agent_name }}</option>
                     {% endfor %}
                 </select>

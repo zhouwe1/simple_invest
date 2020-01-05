@@ -46,9 +46,9 @@ class UserAsset(db.Model):
 
     @staticmethod
     def clear_cache(model, operation):
-        cache_keys = []
-        print('UserAsset', model)
-        pass
+        if operation == 'insert':
+            # 新增持仓记录时，刷新用户的渠道缓存
+            cache.delete('agent_user_{}'.format(model.user_id))
 
 
 class UAAmount(db.Model):
@@ -88,8 +88,6 @@ class UAAmount(db.Model):
 
     @staticmethod
     def clear_cache(model, operation):
-        cache_keys = []
-        print('UAAmount', model)
         pass
 
 
@@ -125,7 +123,7 @@ class Agent(db.Model):
         cache.delete_many(*cache_keys)
 
     @staticmethod
-    def user_cache(user_id):
+    def user_agent(user_id):
         cache_key = 'agent_user_{}'.format(user_id)
         if cache.get(cache_key):
             return cache.get(cache_key)
@@ -133,7 +131,6 @@ class Agent(db.Model):
         for agent in Agent.query.join(UserAsset).filter(
                 Agent.id == UserAsset.agent_id,
                 UserAsset.user_id == user_id,
-                UserAsset.is_delete == 0,
         ).distinct().order_by(Agent.id).all():
             user_dict[agent.id] = agent.name
         cache.set(cache_key, user_dict)

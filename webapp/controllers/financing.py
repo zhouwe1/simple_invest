@@ -132,7 +132,8 @@ def holdings():
         'financing/holdings.html',
         uas=uas,
         fps=FinancialProduct.query.order_by(desc('id')).all(),
-        agents=Agent.user_cache(current_user.id),
+        agents=Agent.name_cache(),
+        user_agents=Agent.user_agent(current_user.id),
         fp_types=FPType.dict(),
     )
 
@@ -162,7 +163,7 @@ def holdings_update():
             # 存在相同理财产品，相同渠道，未删除的记录
             return jsonify({'code': 1, 'msg': '已在{}购买过{}，不要重复添加'.format(agent.name, fp.name)})
         elif ua:
-            # 存在相同理财产品，相同渠道，已删除的记录
+            # 存在相同理财产品，相同渠道，已删除的记录，恢复这条记录
             uaa = UAAmount.update(ua.id, amount)
             ua.update_time = uaa.update_time
             ua.is_delete = False
