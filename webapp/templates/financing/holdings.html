@@ -215,9 +215,9 @@ function uaUpdate(tr) {
                         '</tr>');
                     $('#dataTbody').find('.tr-' + r['id']).addClass('tr-success');
                     setInterval(function () {
-                            $('#dataTbody').find('.tr-' + r['id']).removeClass('tr-success')
-                        }, 1000);
-                        return true
+                        $('#dataTbody').find('.tr-' + r['id']).removeClass('tr-success')
+                    }, 1000);
+                    return true
                 }
                 else{
                     if(todo_mode=='on'){
