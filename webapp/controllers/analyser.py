@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, jsonify, request, redirect, url_for, session
 from flask_login import current_user, login_required
-from webapp.models.financing_models import UserAsset, Agent, FPType
+from webapp.models.financing_models import UserAsset, Agent, FPType, UAAmount
 
 
 analyse_blueprint = Blueprint(
@@ -29,6 +29,41 @@ def trend_ua_detail(ua_id):
     for uaa in ua.amounts.all():
         labels.append(uaa.date.strftime('%Y-%m-%d'))
         datas.append(uaa.amount_yuan)
+    return jsonify({'code': 0, 'labels': labels, 'datas': datas})
+
+
+@analyse_blueprint.route('/trend/amount')
+@login_required
+def trend_amount_index():
+    return render_template('analyse/trend_amount.html')
+
+
+@analyse_blueprint.route('/trend/amount/data')
+@login_required
+def trend_amount_data():
+    uaas = UAAmount.query.join(UserAsset).filter(
+        UserAsset.user_id == current_user.id, UserAsset.id == UAAmount.userasset_id).all()
+    date_dict = dict()
+    for uaa in uaas:
+        date = uaa.date.strftime('%Y-%m-%d')
+        if date in date_dict:
+            date_dict[date]['count'] += 1
+            date_dict[date]['amount'] += uaa.amount_yuan
+        else:
+            date_dict[date] = {
+                'count': 1,
+                'amount': uaa.amount_yuan,
+                'date': date,
+            }
+
+    uaa_list = list(date_dict.values())
+    uaa_list.sort(key=lambda x: x.get('date'))
+
+    labels = []
+    datas = []
+    for date_uaa in uaa_list:
+        labels.append('{}({})'.format(date_uaa.get('date'), date_uaa.get('count')))
+        datas.append(round(date_uaa.get('amount'), 2))
     return jsonify({'code': 0, 'labels': labels, 'datas': datas})
 
 

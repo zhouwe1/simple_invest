@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content_header %}
-    持仓走势
+    持仓趋势
 {% endblock %}
 
 {% block content %}
@@ -25,21 +25,16 @@
         </div>
     </div>
 </div>
-
-
 {% endblock %}
 
 {% block footer_script %}
 <script type="text/javascript">
 $(function () {
-
-
     $('#uaFilter').change(function () {
         let ua_id = $(this).val(),
             url = '{{ url_for('analyse.trend_ua_detail', ua_id=0) }}'.replace(0, ua_id);
-        uaTrendChart(url)
+        fill_trend_ua_chart(url)
     });
 });
-
 </script>
 {% endblock %}

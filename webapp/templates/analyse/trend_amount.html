@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content_header %}
+    总额趋势
+{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header border-0">
+        <div class="alert alert-default-info">图中的总额是当天更新过的持仓金额汇总，日期后面的数字是当天更新的持仓数量。
+            <br><small>建议每次更新持仓时更新所有的持仓记录，即使金额没有变化也可以提交一下相同的金额</small>
+        </div>
+    </div>
+    <div class="card-body table-responsive p-0">
+        <div class="chart">
+            <canvas id="amountTrend" style="height:300px; min-height:300px"></canvas>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer_script %}
+<script type="text/javascript">
+$(function () {
+    fill_trend_amount_chart('{{ url_for('analyse.trend_amount_data') }}');
+})
+</script>
+{% endblock %}
