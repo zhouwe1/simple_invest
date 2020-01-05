@@ -122,8 +122,8 @@
 {% block footer_script %}
 <script type="text/javascript">
 $(function () {
-    fill_dashboard_agent_pie([{% for k, v in agent_tuples %}'{{ k }}',{% endfor %}], [{% for k, v in agent_tuples %}'{{ v }}',{% endfor %}]);
-    fill_dashboard_fptype_pie([{% for k, v in fptype_tuples %}'{{ k }}',{% endfor %}], [{% for k, v in fptype_tuples %}'{{ v }}',{% endfor %}]);
+    fill_dashboard_agent_pie([{% for k, v in agent_tuples %}'{{ k }}',{% endfor %}], [{% for k, v in agent_tuples %}'{{ v|round(2, 'floor') }}',{% endfor %}]);
+    fill_dashboard_fptype_pie([{% for k, v in fptype_tuples %}'{{ k }}',{% endfor %}], [{% for k, v in fptype_tuples %}'{{ v|round(2, 'floor') }}',{% endfor %}]);
 });
 </script>
 {% endblock %}
