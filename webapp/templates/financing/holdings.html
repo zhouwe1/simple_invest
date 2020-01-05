@@ -148,6 +148,7 @@ function resetNewTbody() {
     tbody.find('input').each(function () {$(this).val('')});
     tbody.find('select').val('');
     tbody.find('.tr-submit').removeAttr('disabled');
+    tbody.find('.tr-submit').html('<i class="fa fa-check"></i>');
 }
 
 function uaUpdate(tr) {
@@ -200,7 +201,7 @@ function uaUpdate(tr) {
                 if (id==0){
                     resetNewTbody();
                     $('#dataTbody').prepend('' +
-                        '<tr data-id="'+ r['id'] +'" data-amount="'+ r['amount'] +'" data-update_time="'+ r['update_time'] +'">' +
+                        '<tr data-id="'+ r['id'] +'" data-amount="'+ r['amount'] +'" data-update_time="'+ r['update_time'] +'" class="tr-'+ r['id'] +'">' +
                         '<td>'+ r['name'] + '</td>' +
                         '<td class="td-amount">'+ r['amount'] +'</td>' +
                         '<td class="td-update_time">'+ r['update_time'] +'</td>' +
@@ -209,21 +210,26 @@ function uaUpdate(tr) {
                         '    <button type="button" class="btn btn-success tr-submit d-none"><i class="fa fa-check"></i></button>' +
                         '    <button type="button" class="btn btn-warning tr-cancel d-none"><i class="fa fa-undo"></i></button>' +
                         '</td>' +
-                        '</tr>')
+                        '</tr>');
+                    $('#dataTbody').find('.tr-' + r['id']).addClass('tr-success');
+                    setInterval(function () {
+                            $('#dataTbody').find('.tr-' + r['id']).removeClass('tr-success')
+                        }, 1000);
+                        return true
                 }
                 else{
                     if(todo_mode=='on'){
                         tr.addClass('tr-success');
                         setInterval(function () {
                             tr.remove();
-                        }, 300);
+                        }, 1000);
                         return true
                     }
                     if(r['is_delete']){
                         tr.addClass('tr-danger');
                         setInterval(function () {
                             tr.remove();
-                        }, 300);
+                        }, 1000);
                     }
                     tr.addClass('tr-success');
                     setInterval(function () {
