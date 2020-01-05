@@ -35,34 +35,30 @@
         <table class="table table-valign-middle table-editable">
             <thead>
             <tr>
-                <th width="25%">理财产品</th>
+                <th width="15%">渠道</th>
+                <th width="20%">理财产品</th>
                 <th width="25%">持有金额</th>
-                <th width="25%">更新时间</th>
-                <th width="25%">操作</th>
+                <th width="20%">更新时间</th>
+                <th width="20%">操作</th>
             </tr>
             </thead>
             <tbody id="newTbody" class="d-none">
                 <tr data-id="0" data-name="" data-type="" data-code="">
+                    <td>
+                         <select class="form-control" name="new_agent">
+                             <option value="">渠道</option>
+                             {% for agent_id, agent_name in agents.items() %}
+                             <option value="{{ agent_id }}">{{ agent_name }}</option>
+                              {% endfor %}
+                         </select>
+                    </td>
                     <td class="td-fp">
-                        <div class="form-inline">
-                            <input type="text" name="new_fp" class="form-control" placeholder="模糊查询" autocomplete="off">
-                        </div>
+                        <input type="text" name="new_fp" class="form-control" placeholder="模糊查询" autocomplete="off">
                     </td>
                     <td>
-                        <div class="form-inline">
-                            <input type="number" name="amount" class="form-control" step="1" min="-99999" max="999999" autocomplete="off">
-                        </div>
+                        <input type="number" name="amount" class="form-control" step="any" min="-99999" max="9999999" autocomplete="off">
                     </td>
-                    <td>
-                         <div class="form-inline">
-                             <select class="form-control" name="new_agent">
-                             <option value="">购买渠道</option>
-                                 {% for agent_id, agent_name in agents.items() %}
-                                 <option value="{{ agent_id }}">{{ agent_name }}</option>
-                                 {% endfor %}
-                             </select>
-                         </div>
-                    </td>
+                    <td></td>
                     <td>
                         <button type="button" class="btn btn-success tr-submit"><i class="fa fa-check"></i></button>
                         <button type="button" class="btn btn-warning tr-cancel"><i class="fa fa-undo"></i></button>
@@ -73,7 +69,8 @@
             <tbody id="dataTbody" data-todo="off">
             {% for ua in uas %}
                 <tr data-id="{{ ua.id }}" data-amount="{{ ua.last_amount.amount_yuan }}" data-update_time="{{ ua.last_amount.update_time }}">
-                    <td>{{ ua.agent.name }}:{{ ua.financial_product.name }}</td>
+                    <td>{{ ua.agent.name }}</td>
+                    <td>{{ ua.financial_product.name }}</td>
                     <td class="td-amount">{{ ua.last_amount.amount_yuan }}</td>
                     <td class="td-update_time">{{ ua.last_amount.update_time }}</td>
                     <td>
@@ -116,8 +113,12 @@ $(function () {
         tr.find('.tr-submit').removeClass('d-none');
         tr.find('.tr-cancel').removeClass('d-none');
 
-        tr.find('.td-amount').html('<div class="form-inline"><input type="number" value="'+ current_amount +'"' +
-            ' name="amount" class="form-control" step="1" min="-99999" max="99999999" autocomplete="off"></div>');
+        tr.find('.td-amount').html('<input type="number" value="'+ current_amount +'"' +
+            ' name="amount" class="form-control" step="any" min="-99999" max="9999999"' +
+            ' onfocus="this.select();"' +
+            ' onmouseup="event.preventDefault()" autocomplete="off">');
+
+        tr.find('input:first').focus();
     });
 
     table.on('click', '.tr-cancel', function(){
@@ -202,6 +203,7 @@ function uaUpdate(tr) {
                     resetNewTbody();
                     $('#dataTbody').prepend('' +
                         '<tr data-id="'+ r['id'] +'" data-amount="'+ r['amount'] +'" data-update_time="'+ r['update_time'] +'" class="tr-'+ r['id'] +'">' +
+                        '<td>'+ r['agent'] + '</td>' +
                         '<td>'+ r['name'] + '</td>' +
                         '<td class="td-amount">'+ r['amount'] +'</td>' +
                         '<td class="td-update_time">'+ r['update_time'] +'</td>' +

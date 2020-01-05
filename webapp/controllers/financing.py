@@ -171,6 +171,7 @@ def holdings_update():
             return jsonify({
                 'code': 0,
                 'id': ua.id,
+                'agent': ua.agent_name,
                 'name': ua.fp_name,
                 'amount': str(ua.last_amount.amount_yuan),
                 'update_time': ua.update_time_str,
@@ -185,6 +186,7 @@ def holdings_update():
                 return jsonify({
                     'code': 0,
                     'id': ua.id,
+                    'agent': ua.agent_name,
                     'name': ua.fp_name,
                     'amount': str(ua.last_amount.amount_yuan),
                     'update_time': ua.update_time_str,

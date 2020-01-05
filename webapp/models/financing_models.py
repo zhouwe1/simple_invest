@@ -34,7 +34,11 @@ class UserAsset(db.Model):
 
     @property
     def fp_name(self):
-        return '{}:{}'.format(self.agent.name, self.financial_product.name)
+        return FinancialProduct.name_cache().get(self.fp)
+
+    @property
+    def agent_name(self):
+        return Agent.name_cache().get(self.agent_id)
 
     @property
     def last_amount(self):
