@@ -9,19 +9,19 @@ analyse_blueprint = Blueprint(
 )
 
 
-@analyse_blueprint.route('/trend')
+@analyse_blueprint.route('/trend/ua')
 @login_required
-def trend():
+def trend_ua_index():
     uas = UserAsset.query.filter_by(user_id=current_user.id, is_delete=False).order_by(UserAsset.update_time.desc()).all()
     return render_template(
-        'analyse/trend.html',
+        'analyse/trend_ua.html',
         uas=uas,
     )
 
 
-@analyse_blueprint.route('/trend/<string:ua_id>')
+@analyse_blueprint.route('/trend/ua/<string:ua_id>')
 @login_required
-def trend_ua(ua_id):
+def trend_ua_detail(ua_id):
     ua = UserAsset.query.filter_by(user_id=current_user.id, id=ua_id).first()
 
     labels = []
