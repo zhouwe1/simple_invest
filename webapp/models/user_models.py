@@ -12,6 +12,7 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(32), unique=True)
     last_login = db.Column(db.DateTime(timezone=True))
     join_date = db.Column(db.DateTime(timezone=True), default=public.now)
+    goal = db.Column(db.Integer(), default=0)
 
     def __init__(self, username, password, email):
         """
@@ -44,3 +45,7 @@ class User(db.Model, UserMixin):
     @property
     def holdings_count(self):
         return UserAsset.query.filter(user_id=self.id, is_delete=False).count()
+
+    @property
+    def goal_yuan(self):
+        return int(self.goal / 100)

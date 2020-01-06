@@ -12,5 +12,3 @@ user_blueprint = Blueprint(
 @login_required
 def home():
     return render_template('user.html')
-
-

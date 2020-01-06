@@ -79,7 +79,7 @@ def logout():
 @home_blueprint.route('/')
 @login_required
 def dashboard():
-    target = 400000
+    goal = current_user.goal_yuan
     agent_dict = dict()
     fptype_dict = dict()
     total_amount = 0  # 总金额
@@ -118,10 +118,14 @@ def dashboard():
     for k, v in fptype_dict.items():
         fptype_tuples.append((FPType.dict().get(k), v))
     fptype_tuples.sort(key=lambda x: x[1], reverse=True)
+    if goal:
+        goal_rate = round(total_amount/current_user.goal_yuan * 100, 1)
+    else:
+        goal_rate = 0
     return render_template(
         'home/dashboard.html',
-        target=400000,
-        target_rate=round(total_amount/target * 100, 1),
+        goal=goal,
+        goal_rate=goal_rate,
         fp_count=fp_count,
         total_amount=round(total_amount, 2),
         last_update=last_update,
