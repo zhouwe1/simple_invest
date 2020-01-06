@@ -73,11 +73,7 @@
                     <td>{{ ua.financial_product.name }}</td>
                     <td class="td-amount">{{ ua.last_amount.amount_yuan }}</td>
                     <td class="td-update_time">{{ ua.last_amount.update_time }}</td>
-                    <td>
-                        <button type="button" class="btn btn-info tr-update"><i class="fas fa-pencil-alt"></i></button>
-                        <button type="button" class="btn btn-warning tr-cancel d-none"><i class="fa fa-undo"></i></button>
-                        <button type="button" class="btn btn-success tr-submit d-none"><i class="fa fa-check"></i></button>
-                    </td>
+                    <td></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -93,6 +89,14 @@
 let fp_list = [{% for fp in fps %}'{{ fp.name }}',{% endfor %}];
 $(function () {
     let table = $('.table-editable');
+
+    $('#dataTbody tr').each(function(){
+        $(this).children('td:last').html(
+            '<button type="button" class="btn btn-info tr-update"><i class="fas fa-pencil-alt"></i></button> ' +
+            '<button type="button" class="btn btn-warning tr-cancel d-none"><i class="fa fa-undo"></i></button> ' +
+            '<button type="button" class="btn btn-success tr-submit d-none"><i class="fa fa-check"></i></button>'
+        )
+    })
 
     table.on('click', '.tr-submit', function () {
         let tr = $(this).parents('tr');
