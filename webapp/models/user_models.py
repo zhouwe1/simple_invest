@@ -13,6 +13,7 @@ class User(db.Model, UserMixin):
     last_login = db.Column(db.DateTime(timezone=True))
     join_date = db.Column(db.DateTime(timezone=True), default=public.now)
     goal = db.Column(db.Integer(), default=0)
+    family_id = db.Column(db.Integer(), db.ForeignKey('family.id', ondelete='RESTRICT'), default=None)
 
     def __init__(self, username, password, email):
         """
@@ -45,6 +46,34 @@ class User(db.Model, UserMixin):
     @property
     def holdings_count(self):
         return UserAsset.query.filter(user_id=self.id, is_delete=False).count()
+
+    @property
+    def goal_yuan(self):
+        return int(self.goal / 100)
+
+
+class Family(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    name = db.Column(db.String(20))
+    goal = db.Column(db.Integer(), default=0)
+    create_time = db.Column(db.DateTime(timezone=True))
+    update_time = db.Column(db.DateTime(timezone=True))
+    users = db.relationship(
+        'User',
+        backref='family',
+        lazy='dynamic'
+    )
+
+    def __init__(self, name, goal):
+        """
+        创建家庭
+        :param name:
+        :param goal:
+        """
+        self.name = name
+        self.goal = goal
+        db.session.add(self)
+        db.session.commit()
 
     @property
     def goal_yuan(self):

@@ -11,4 +11,10 @@ user_blueprint = Blueprint(
 @user_blueprint.route('/')
 @login_required
 def home():
-    return render_template('user.html')
+    return render_template('user/user.html')
+
+
+@user_blueprint.route('/family')
+@login_required
+def family():
+    return render_template('user/user.html')
