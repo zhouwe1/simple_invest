@@ -92,7 +92,7 @@ class UAAmount(db.Model):
 
     @staticmethod
     def clear_cache(model, operation):
-        pass
+        cache.delete('user_asset_summary_{}'.format(model.user_asset.user_id))
 
 
 class Agent(db.Model):
