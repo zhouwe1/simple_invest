@@ -12,7 +12,7 @@
             <div class="info-box-content">
                 <span class="info-box-text">持仓金额</span>
                 <span class="info-box-number">
-                    {{ total_amount }}
+                    {{ asset_summary.total_amount | round(2, 'floor') }}
                 </span>
             </div>
             <!-- /.info-box-content -->
@@ -26,7 +26,7 @@
             <div class="info-box-content">
                 <span class="info-box-text">理财产品</span>
                 <span class="info-box-number">
-                    {{ fp_count }}
+                    {{ asset_summary.fp_count }}
                 </span>
             </div>
             <!-- /.info-box-content -->
@@ -40,8 +40,8 @@
             <div class="info-box-content">
                 <span class="info-box-text">最后更新</span>
                 <span class="info-box-number">
-                    {% if last_update %}
-                        {{ last_update.strftime('%m-%d %H:%M') }}
+                    {% if asset_summary.last_update %}
+                        {{ asset_summary.last_update.strftime('%m-%d %H:%M') }}
                     {% else %}
                         <small>还未提交数据</small>
                     {% endif %}
@@ -56,9 +56,9 @@
         <div class="info-box">
             <span class="info-box-icon bg-success elevation-1"><i class="fas fa-thumbs-up"></i></span>
             <div class="info-box-content">
-                <span class="info-box-text">目标 <b>{{ goal }}</b></span>
+                <span class="info-box-text">目标 <b>{{ asset_summary.goal }}</b></span>
                 <div class="progress">
-                    <div title="{{ goal_rate }}%" class="progress-bar" style="width: {{ goal_rate }}%"></div>
+                    <div title="{{ asset_summary.goal_rate }}%" class="progress-bar" style="width: {{ asset_summary.goal_rate }}%"></div>
               </div>
             </div>
             <!-- /.info-box-content -->
@@ -122,8 +122,8 @@
 {% block footer_script %}
 <script type="text/javascript">
 $(function () {
-    fill_dashboard_agent_pie([{% for k, v in agent_tuples %}'{{ k }}',{% endfor %}], [{% for k, v in agent_tuples %}'{{ v|round(2, 'floor') }}',{% endfor %}]);
-    fill_dashboard_fptype_pie([{% for k, v in fptype_tuples %}'{{ k }}',{% endfor %}], [{% for k, v in fptype_tuples %}'{{ v|round(2, 'floor') }}',{% endfor %}]);
+    fill_dashboard_agent_pie([{% for k, v in asset_summary.get('agent_tuples') %}'{{ k }}',{% endfor %}], [{% for k, v in asset_summary.get('agent_tuples') %}'{{ v|round(2, 'floor') }}',{% endfor %}]);
+    fill_dashboard_fptype_pie([{% for k, v in asset_summary.get('fptype_tuples') %}'{{ k }}',{% endfor %}], [{% for k, v in asset_summary.get('fptype_tuples') %}'{{ v|round(2, 'floor') }}',{% endfor %}]);
 });
 </script>
 {% endblock %}

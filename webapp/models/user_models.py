@@ -1,8 +1,8 @@
-from webapp.extentions import db
+from webapp.extentions import db, cache
 from flask_login import UserMixin
 from werkzeug.security import check_password_hash, generate_password_hash
 from webapp.functions import public
-from .financing_models import UserAsset
+from .financing_models import UserAsset, FPType, Agent
 
 
 class User(db.Model, UserMixin):
@@ -44,12 +44,69 @@ class User(db.Model, UserMixin):
         db.session.commit()
 
     @property
-    def holdings_count(self):
-        return UserAsset.query.filter(user_id=self.id, is_delete=False).count()
-
-    @property
     def goal_yuan(self):
         return int(self.goal / 100)
+
+    @property
+    def asset_summary(self):
+        cache_key = 'user_asset_summary_{}'.format(self.id)
+        if cache.get(cache_key):
+            return cache.get(cache_key)
+
+        asset_dict = {'goal': self.goal_yuan,
+                      'fp_count': 0,
+                      'total_amount': 0,
+                      'last_update': '',
+                      'agent_tuples': list(),
+                      'fptype_tuples': list(),
+                      }
+        agent_dict = dict()
+        fptype_dict = dict()
+        last_update = None
+        for ua in UserAsset.query.filter_by(user_id=self.id, is_delete=False).all():
+            # 获取最后更新时间
+            if not last_update:
+                asset_dict['last_update'] = ua.update_time
+            elif ua.update_time > last_update:
+                asset_dict['last_update'] = ua.update_time
+
+            amount = ua.last_amount.amount_yuan
+            asset_dict['total_amount'] += amount
+            asset_dict['fp_count'] += 1
+
+            # 汇总每个渠道的总金额
+            agent_id = ua.agent_id
+            if agent_id in agent_dict:
+                agent_dict[agent_id] += amount
+            else:
+                agent_dict[agent_id] = amount
+
+            # 汇总每个理财类型的总金额
+            fp_type_id = ua.financial_product.type_id
+            if fp_type_id in fptype_dict:
+                fptype_dict[fp_type_id] += amount
+            else:
+                fptype_dict[fp_type_id] = amount
+
+        agent_tuples = []
+        for k, v in agent_dict.items():
+            agent_tuples.append((Agent.name_cache().get(k), v))
+        agent_tuples.sort(key=lambda x: x[1], reverse=True)
+        asset_dict['agent_tuples'] = agent_tuples
+
+        fptype_tuples = []
+        for k, v in fptype_dict.items():
+            fptype_tuples.append((FPType.dict().get(k), v))
+        fptype_tuples.sort(key=lambda x: x[1], reverse=True)
+        asset_dict['fptype_tuples'] = fptype_tuples
+
+        if self.goal:
+            goal_rate = round(asset_dict['total_amount'] / self.goal_yuan * 100, 1)
+        else:
+            goal_rate = 0
+        asset_dict['goal_rate'] = goal_rate
+        cache.set(cache_key, asset_dict)
+        return asset_dict
 
 
 class Family(db.Model):
