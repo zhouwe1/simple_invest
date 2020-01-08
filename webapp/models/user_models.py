@@ -77,26 +77,28 @@ class User(db.Model, UserMixin):
             # 汇总每个渠道的总金额
             agent_id = ua.agent_id
             if agent_id in agent_dict:
-                agent_dict[agent_id] += amount
+                agent_dict[agent_id]['amount'] += amount
+                agent_dict[agent_id]['count'] += 1
             else:
-                agent_dict[agent_id] = amount
+                agent_dict[agent_id] = {'amount': amount, 'count': 1}
 
             # 汇总每个理财类型的总金额
             fp_type_id = ua.financial_product.type_id
             if fp_type_id in fptype_dict:
-                fptype_dict[fp_type_id] += amount
+                fptype_dict[fp_type_id]['amount'] += amount
+                fptype_dict[fp_type_id]['count'] += 1
             else:
-                fptype_dict[fp_type_id] = amount
+                fptype_dict[fp_type_id] = {'amount': amount, 'count': 1}
 
         agent_tuples = []
         for k, v in agent_dict.items():
-            agent_tuples.append((Agent.name_cache().get(k), v))
+            agent_tuples.append((Agent.name_cache().get(k), v.get('amount'), v.get('count')))
         agent_tuples.sort(key=lambda x: x[1], reverse=True)
         asset_dict['agent_tuples'] = agent_tuples
 
         fptype_tuples = []
         for k, v in fptype_dict.items():
-            fptype_tuples.append((FPType.dict().get(k), v))
+            fptype_tuples.append((FPType.dict().get(k), v.get('amount'), v.get('count')))
         fptype_tuples.sort(key=lambda x: x[1], reverse=True)
         asset_dict['fptype_tuples'] = fptype_tuples
 

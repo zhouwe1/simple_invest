@@ -122,8 +122,8 @@
 {% block footer_script %}
 <script type="text/javascript">
 $(function () {
-    fill_dashboard_agent_pie([{% for k, v in asset_summary.get('agent_tuples') %}'{{ k }}',{% endfor %}], [{% for k, v in asset_summary.get('agent_tuples') %}'{{ v|round(2, 'floor') }}',{% endfor %}]);
-    fill_dashboard_fptype_pie([{% for k, v in asset_summary.get('fptype_tuples') %}'{{ k }}',{% endfor %}], [{% for k, v in asset_summary.get('fptype_tuples') %}'{{ v|round(2, 'floor') }}',{% endfor %}]);
+    fill_dashboard_agent_pie([{% for name, amount, _ in asset_summary.get('agent_tuples') %}'{{ name }}',{% endfor %}], [{% for name, amount, _ in asset_summary.get('agent_tuples') %}'{{ amount|round(2, 'floor') }}',{% endfor %}]);
+    fill_dashboard_fptype_pie([{% for name, amount, _ in asset_summary.get('fptype_tuples') %}'{{ name }}',{% endfor %}], [{% for name, amount, _ in asset_summary.get('fptype_tuples') %}'{{ amount|round(2, 'floor') }}',{% endfor %}]);
 });
 </script>
 {% endblock %}
