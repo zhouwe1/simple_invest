@@ -45,7 +45,10 @@ class User(db.Model, UserMixin):
 
     @property
     def goal_yuan(self):
-        return int(self.goal / 100)
+        if self.goal:
+            return int(self.goal / 100)
+        else:
+            return 0
 
     @property
     def asset_summary(self):
