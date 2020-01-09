@@ -35,12 +35,32 @@
         </table>
     </div>
 </div>
+
+
+<div class="modal fade" id="noFamilyModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">没有家庭理财项目</h4>
+            </div>
+            <div class="modal-body">
+                创建或者加入一个家庭理财项目吧
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" >好的</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">下次</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block footer_script %}
 <script type="text/javascript">
 $(function () {
-
+    {% if not current_user.family_id %}
+    $('#noFamilyModal').modal('show');
+    {% endif %}
 });
 </script>
 {% endblock %}
