@@ -29,7 +29,7 @@
                 </td>
                 <td>{{ current_user.asset_summary.total_amount | round(2, 'floor') }}</td>
                 <td>{{ current_user.asset_summary.fp_count }}</td>
-                <td>{{ current_user.asset_summary.last_update.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>{{ current_user.asset_summary.last_update.strftime('%m-%d %H:%M') }}</td>
             </tr>
             </tbody>
         </table>

@@ -19,9 +19,9 @@
 
             <li class="nav-item has-treeview">
                 <a href="#" class="nav-link">
-                    <i class="nav-icon fas fa-piggy-bank"></i>
+                    <i class="nav-icon fas fa-tools"></i>
                     <p>
-                        理财
+                        数据设置
                         <i class="right fas fa-angle-left"></i>
                     </p>
                 </a>
@@ -36,12 +36,6 @@
                         <a href="{{ url_for('financing.fp_index') }}" class="nav-link">
                             <i class="far fa-circle nav-icon"></i>
                             <p>理财产品</p>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a href="{{ url_for('financing.holdings') }}" class="nav-link">
-                            <i class="far fa-circle nav-icon"></i>
-                            <p>持仓明细</p>
                         </a>
                     </li>
                 </ul>
@@ -79,13 +73,19 @@
 
             <li class="nav-item has-treeview">
                 <a href="#" class="nav-link">
-                    <i class="nav-icon fas fa-user-circle"></i>
+                    <i class="nav-icon fas fa-piggy-bank"></i>
                     <p>
-                        个人中心
+                        理财
                         <i class="right fas fa-angle-left"></i>
                     </p>
                 </a>
                 <ul class="nav nav-treeview">
+                    <li class="nav-item">
+                        <a href="{{ url_for('financing.holdings') }}" class="nav-link">
+                            <i class="far fa-circle nav-icon"></i>
+                            <p>我的持仓</p>
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a href="{{ url_for('user.family') }}" class="nav-link">
                             <i class="far fa-circle nav-icon"></i>
