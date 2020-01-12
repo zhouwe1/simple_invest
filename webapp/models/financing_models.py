@@ -46,7 +46,7 @@ class UserAsset(db.Model):
 
     @property
     def update_time_str(self):
-        return self.update_time.strftime("%Y-%m-%d %H:%M:%S")
+        return self.update_time.strftime("%m-%d %H:%M")
 
     @staticmethod
     def clear_cache(model, operation):

@@ -133,7 +133,7 @@ def family_index():
             family_summary['fp_count'] += user_asset.get('fp_count')
             family_summary['count'] += 1
             family_summary['goal_rate'] += goal_rate
-
+        family_summary['total_amount'] = round(family_summary['total_amount'], 2)
         members.sort(key=lambda x: x.get('total_amount'), reverse=True)
     else:
         family_summary = {}
