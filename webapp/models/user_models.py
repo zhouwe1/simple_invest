@@ -69,9 +69,9 @@ class User(db.Model, UserMixin):
         for ua in UserAsset.query.filter_by(user_id=self.id, is_delete=False).all():
             # 获取最后更新时间
             if not last_update:
-                asset_dict['last_update'] = ua.update_time
+                asset_dict['last_update'] = ua.update_time_str
             elif ua.update_time > last_update:
-                asset_dict['last_update'] = ua.update_time
+                asset_dict['last_update'] = ua.update_time_str
 
             amount = ua.last_amount.amount_yuan
             asset_dict['total_amount'] += amount
