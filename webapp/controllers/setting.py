@@ -1,5 +1,5 @@
-from flask import Blueprint, render_template, request, jsonify
-from flask_login import login_required
+from flask import Blueprint, render_template, request, jsonify, abort
+from flask_login import login_required, current_user
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql import desc
 from webapp.models.financing_models import Agent, FinancialProduct, FPType
@@ -10,6 +10,12 @@ setting_blueprint = Blueprint(
     'setting',
     __name__
 )
+
+
+@setting_blueprint.before_request
+def check_is_staff():
+    if not current_user.is_staff:
+        return abort(403)
 
 
 @setting_blueprint.route('/agents')

@@ -14,6 +14,7 @@ class User(db.Model, UserMixin):
     join_date = db.Column(db.DateTime(timezone=True), default=public.now)
     goal = db.Column(db.Integer(), default=0)
     family_id = db.Column(db.Integer(), db.ForeignKey('family.id', ondelete='RESTRICT'), default=None)
+    is_staff = db.Column(db.Boolean(), default=False)
 
     def __init__(self, username, password, email):
         """
