@@ -37,7 +37,7 @@ class User(db.Model, UserMixin):
 
     @property
     def avatar(self):
-        return public.get_avatar()
+        return public.get_avatar(self.email)
 
     def refresh_last_login(self):
         self.last_login = public.now()
