@@ -123,7 +123,7 @@ $(function () {
                     tr.find('.tr-delete').html('<i class="fa fa-spinner fa-pulse"></>');
 
                     $.ajax({
-                        url: '{{ url_for('financing.fp_delete') }}',
+                        url: '{{ url_for('setting.fp_delete') }}',
                         type: 'GET',
                         dataType: 'json',
                         data: {'id': id},
@@ -131,15 +131,15 @@ $(function () {
                             if(r['code']==0){
                                 setInterval(function () {
                                 tr.remove();
-                                }, 300);
+                                }, 500);
                             }
                             else{
-                                $.growl.error({title: '发生错误', message: r['msg'], location:"tr"});
+                                swalError(r['msg']);
                                 tr.removeClass('tr-danger');
                                 tr.addClass('tr-error');
                                 setInterval(function () {
                                     tr.removeClass('tr-error');
-                                }, 300);
+                                }, 500);
                                 tr.find('.tr-delete').html('<i class="fas fa-trash"></i>');
                                 tr.find('.tr-delete').removeAttr('disabled');
                             }
@@ -185,8 +185,8 @@ function fpUpdate(tr) {
             tr.addClass('tr-error');
             setInterval(function () {
                 tr.removeClass('tr-error')
-            }, 1000);
-            $.growl.error({title: '发生错误', message: '股票或基金请填写代码', location:"tr"});
+            }, 500);
+            swalError('股票或基金请填写代码');
             return false
         }
     }
@@ -195,7 +195,7 @@ function fpUpdate(tr) {
     submit_btn.attr('disabled', 'disabled');  //保存按钮disabled
 
     $.ajax({
-        url: '{{ url_for('financing.fp_update') }}',
+        url: '{{ url_for('setting.fp_update') }}',
         type: 'POST',
         dataType: 'json',
         data: {'id': id, 'name': new_name, 'fp_type': new_type, 'fp_code': new_code},
@@ -225,7 +225,7 @@ function fpUpdate(tr) {
                 }, 1000);
                 submit_btn.text('提交');
                 submit_btn.removeAttr('disabled');
-                $.growl.error({title: '发生错误', message: r['msg'], location:"tr"});
+                swalError(r['msg'])
             }
         }
     })

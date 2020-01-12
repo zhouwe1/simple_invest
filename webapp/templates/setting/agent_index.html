@@ -96,7 +96,7 @@ $(function () {
                     tr.find('.tr-delete').html('<i class="fa fa-spinner fa-pulse"></>');
 
                     $.ajax({
-                        url: '{{ url_for('financing.agent_delete') }}',
+                        url: '{{ url_for('setting.agent_delete') }}',
                         type: 'GET',
                         dataType: 'json',
                         data: {'id': id},
@@ -104,15 +104,15 @@ $(function () {
                             if(r['code']==0){
                                 setInterval(function () {
                                 tr.remove();
-                                }, 300);
+                                }, 500);
                             }
                             else{
-                                $.growl.error({title: '发生错误', message: r['msg'], location:"tr"});
+                                swalError(r['msg']);
                                 tr.removeClass('tr-danger');
                                 tr.addClass('tr-error');
                                 setInterval(function () {
                                     tr.removeClass('tr-error');
-                                }, 300);
+                                }, 500);
                                 tr.find('.tr-delete').html('<i class="fas fa-trash"></i>');
                                 tr.find('.tr-delete').removeAttr('disabled');
                             }
@@ -155,7 +155,7 @@ function agentUpdate(tr) {
     submit_btn.attr('disabled', 'disabled');  //保存按钮disabled
 
     $.ajax({
-        url: '{{ url_for('financing.agent_update') }}',
+        url: '{{ url_for('setting.agent_update') }}',
         type: 'POST',
         dataType: 'json',
         data: {'id': id, 'name': new_name},
@@ -164,7 +164,7 @@ function agentUpdate(tr) {
                 tr.addClass('tr-success');
                 setInterval(function () {
                     tr.removeClass('tr-success')
-                }, 1000);
+                }, 500);
                 update_btn.removeAttr('disabled');
                 update_btn.html('<i class="fas fa-pencil-alt"></i>');
                 cancel_btn.addClass('d-none');
@@ -182,11 +182,11 @@ function agentUpdate(tr) {
                 tr.addClass('tr-error');
                 setInterval(function () {
                     tr.removeClass('tr-error')
-                }, 1000);
+                }, 500);
                 name_input.val(old_name);
                 submit_btn.text('提交');
                 submit_btn.removeAttr('disabled');
-                $.growl.error({title: '发生错误', message: r['msg'], location:"tr"});
+                swalError(r['msg'])
             }
         }
     })

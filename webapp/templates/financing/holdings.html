@@ -172,7 +172,7 @@ function uaUpdate(tr) {
         setInterval(function () {
             tr.removeClass('tr-error');
         }, 1000);
-        $.growl.error({title: title, message: msg, location:"tr"});
+        swalError(msg);
         error_ct += 1
     }
     if(tr.find('input[name="new_fp"]').length>0){

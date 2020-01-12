@@ -34,7 +34,7 @@ $(function () {
     $('.tr-todo').click(function () {
         let todo_mode = $('#dataTbody').attr('data-todo');
         if(todo_mode=='on'){
-            $.growl.notice({title: '已退出Todo模式', message: '请等待页面刷新', location:"tr"});
+            swalSuccess('已退出Todo模式，请等待页面刷新');
             setTimeout(function(){
                 location.reload()
             }, 1000);
@@ -44,7 +44,7 @@ $(function () {
             $('#dataTbody').attr('data-todo', 'on');
             $(this).addClass('btn-primary');
             $(this).removeClass('btn-default');
-            $.growl.notice({title: 'Todo模式开启', message: '今天内更新过的记录都会被隐藏，只留下待更新的记录', location:"tr"});
+            swalInfo('Todo模式开启，今天内更新过的记录都会被隐藏，只留下待更新的记录');
             $('#dataTbody tr').each(function () {
                 let tr_date = $(this).attr('data-update_time'),
                     tr = $(this);
@@ -205,4 +205,5 @@ function fill_trend_ua_chart(url) {
 }
 
 function swalError(msg) {Toast.fire({type: 'error', title: msg})}
+function swalInfo(msg) {Toast.fire({type: 'info', title: msg})}
 function swalSuccess(msg) {Toast.fire({type: 'success', title: msg})}
