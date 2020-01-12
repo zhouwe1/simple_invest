@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
 from flask_login import login_user, logout_user, login_required, current_user
 from webapp.models.user_models import User
-from webapp.models.financing_models import UserAsset, FPType, Agent
 
 
 home_blueprint = Blueprint(

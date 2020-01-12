@@ -15,8 +15,8 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <!-- icheck bootstrap -->
     <link rel="stylesheet" href="{{ url_for('static', filename='plugins/icheck-bootstrap/icheck-bootstrap.min.css') }}">
-    <!--jQuery-Growl-->
-    <link rel="stylesheet" href="{{ url_for('static', filename='plugins/jquery-growl/jquery.growl.css') }}">
+    <!--sweetalert2-->
+    <link rel="stylesheet" href="http://cdn.staticfile.org/limonte-sweetalert2/8.11.8/sweetalert2.min.css">
 </head>
 
 <body class="hold-transition sidebar-mini pace-primary">
@@ -53,8 +53,10 @@
 
         <!-- Main content -->
         <section class="content">
-            {% block content %}
-            {% endblock %}
+            <div class="container-fluid">
+                {% block content %}
+                {% endblock %}
+            </div>
         </section><!-- /.content -->
 
     </div>
@@ -74,8 +76,8 @@
 <script src="http://cdn.staticfile.org/twitter-bootstrap/4.4.1/js/bootstrap.bundle.js"></script>
 <!-- Bootbox -->
 <script src="http://cdn.staticfile.org/bootbox.js/5.4.0/bootbox.min.js"></script>
-<!--jQuery-Growl-->
-<script src="{{ url_for('static', filename='plugins/jquery-growl/jquery.growl.js') }}"></script>
+<!--sweetalert2-->
+<script src="http://cdn.staticfile.org/limonte-sweetalert2/8.11.8/sweetalert2.min.js"></script>
 <!-- jquery.devbridge-autocomplete -->
 <script src="http://cdn.staticfile.org/jquery.devbridge-autocomplete/1.4.10/jquery.autocomplete.min.js"></script>
 <!--Chart.js-->

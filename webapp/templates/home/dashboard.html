@@ -40,11 +40,7 @@
             <div class="info-box-content">
                 <span class="info-box-text">最后更新</span>
                 <span class="info-box-number">
-                    {% if asset_summary.last_update %}
-                        {{ asset_summary.last_update.strftime('%m-%d %H:%M') }}
-                    {% else %}
-                        <small>还未提交数据</small>
-                    {% endif %}
+                    {{ asset_summary.last_update }}
                 </span>
             </div>
             <!-- /.info-box-content -->

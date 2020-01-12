@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, jsonify, request, redirect, url_for, session
+from flask import Blueprint, render_template, jsonify
 from flask_login import current_user, login_required
-from webapp.models.financing_models import UserAsset, Agent, FPType, UAAmount
+from webapp.models.financing_models import UserAsset, UAAmount
 
 
 analyse_blueprint = Blueprint(

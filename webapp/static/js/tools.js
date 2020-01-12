@@ -64,6 +64,13 @@ $(function () {
     })
 });
 
+let Toast = Swal.mixin({
+      toast: true,
+      position: 'top-end',
+      showConfirmButton: false,
+      timer: 3000
+    });
+
 let pieOptions = {
         maintainAspectRatio : false,
         responsive : true,
@@ -83,7 +90,6 @@ let pieOptions = {
         }
     };
 
-
 function load_avatar(url) {
     $('#nav-user-avatar').prepend('<img alt src="'+ url +'" class="user-image img-circle elevation-2">');
     $('.user-header').prepend('<img src="'+ url +'" class="img-circle elevation-2" alt="User Image">')
@@ -100,6 +106,7 @@ function refresh_sidebar() {
 }
 
 function fill_dashboard_agent_pie(labels, datas){
+    //dashboard页面渠道占比
     let agentData = {
             labels: labels,
             datasets: [{
@@ -116,6 +123,7 @@ function fill_dashboard_agent_pie(labels, datas){
 }
 
 function fill_dashboard_fptype_pie(labels, datas){
+    //dashboard页面类型占比
     let agentData = {
             labels: labels,
             datasets: [{
@@ -132,6 +140,7 @@ function fill_dashboard_fptype_pie(labels, datas){
 }
 
 function fill_trend_amount_chart(url) {
+    //总额趋势图
     $.ajax({
         url: url,
         type: 'GET',
@@ -163,6 +172,7 @@ function fill_trend_amount_chart(url) {
 }
 
 function fill_trend_ua_chart(url) {
+    //持仓理财产品趋势图
     $.ajax({
         url: url,
         type: 'GET',
@@ -193,3 +203,6 @@ function fill_trend_ua_chart(url) {
         },
     })
 }
+
+function swalError(msg) {Toast.fire({type: 'error', title: msg})}
+function swalSuccess(msg) {Toast.fire({type: 'success', title: msg})}

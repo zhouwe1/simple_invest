@@ -6,61 +6,138 @@
 
 {% block content %}
 
-<div class="card">
-    <div class="card-header border-0">
-        <h3 class="card-title"></h3>
+{% if family %}
+<div class="card p-3 mb-3">
+    <div class="row">
+        <div class="col-12">
+            <h4>
+                <i class="fas fa-home"></i> {{ family.name }} <button type="button" class="btn btn-default btn-sm"><i class="fas fa-pencil-alt"></i></button>
+            </h4>
+        </div>
     </div>
-
-    <div class="card-body table-responsive p-0">
-        <table class="table table-striped table-valign-middle">
+    <div class="row">
+        <div class="col-sm-6">
+            <address>
+                <b>创建人:</b> {{ family.parent }}<br>
+                <b>创建时间:</b> {{ family.create_time }}<br>
+                <b>成员数量:</b> {{ family_summary.count }}
+            </address>
+        </div>
+        <div class="col-sm-6">
+            <address>
+                <b>家庭目标:</b> {{ family_summary.goal_yuan }} <button type="button" class="btn btn-default btn-xs"><i class="fas fa-pencil-alt"></i></button><br>
+                <b>家庭资产:</b> {{ family_summary.total_amount }}<br>
+                <b>理财产品:</b> {{ family_summary.fp_count }}
+            </address>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 table-responsive">
+            <table class="table table-valign-middle">
             <thead>
             <tr>
                 <th>成员</th>
-                <th>资产</th>
                 <th>理财产品数量</th>
+                <th>资产</th>
+                <th>目标达成</th>
                 <th>最后更新时间</th>
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>
-                    <img src="{{ session.avatar }}" class="img-circle img-size-32 mr-2">
-                    {{ current_user.username }}
-                </td>
-                <td>{{ current_user.asset_summary.total_amount | round(2, 'floor') }}</td>
-                <td>{{ current_user.asset_summary.fp_count }}</td>
-                <td>{{ current_user.asset_summary.last_update.strftime('%m-%d %H:%M') }}</td>
-            </tr>
+            {% for m in members %}
+                <tr>
+                    <td>
+                        <img src="{{ m.avatar }}" class="img-circle img-size-32 mr-2" alt="">
+                        {{ m.username }}
+                    </td>
+                    <td>{{ m.fp_count }}</td>
+                    <td>{{ m.total_amount }}</td>
+                    <td>
+                        <div class="progress progress-sm active">
+                            <div class="progress-bar bg-success progress-bar-striped" role="progressbar"
+                                 style="width: {{ m.family_goal_rate }}%" title="{{ m.family_goal_rate }}%">
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ m.last_update }}</td>
+                </tr>
+            {% endfor %}
             </tbody>
-        </table>
+            <tfoot>
+                <tr>
+                    <td><b>汇总</b></td>
+                    <td><b>{{ family_summary.fp_count }}</b></td>
+                    <td><b>{{ family_summary.total_amount }}</b></td>
+                    <td> <div class="progress progress-sm active">
+                        <div class="progress-bar bg-success progress-bar-striped" role="progressbar"
+                             style="width: {{ family_summary.goal_rate }}%" title="{{family_summary.goal_rate}}%">
+                        </div>
+                    </div></td>
+                    <td></td>
+                </tr>
+            </tfoot>
+            </table>
+        </div>
     </div>
 </div>
-
-
-<div class="modal fade" id="noFamilyModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h4 class="modal-title">没有家庭理财项目</h4>
+{% else %}
+<div class="row">
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="modal-title">创建家庭理财</h4>
             </div>
-            <div class="modal-body">
-                创建或者加入一个家庭理财项目吧
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="familyName">家庭理财项目名称</label>
+                    <input type="text" id="familyName" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="familyGoal">目标(元)</label>
+                    <input type="number" id="familyGoal" class="form-control">
+                </div>
+                <div class="form-group">
+                    <button class="btn btn-primary btn-md" id="familySubmit" type="button">提交</button>
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" >好的</button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">下次</button>
+        </div>
+    </div>
+
+    <div class="col-12 col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="modal-title">加入家庭理财</h4>
+            </div>
+            <div class="card-body">
+                需要家庭成员的邀请才能加入。
             </div>
         </div>
     </div>
 </div>
+{% endif %}
+
 {% endblock %}
 
 {% block footer_script %}
 <script type="text/javascript">
 $(function () {
-    {% if not current_user.family_id %}
-    $('#noFamilyModal').modal('show');
-    {% endif %}
+    $('#familySubmit').click(function () {
+        let name = $('#familyName').val(),
+            goal = $('#familyGoal').val();
+        if(!name) {swalError('请输入家庭理财项目的名称'); return false}
+        if(!goal) {swalError('请输入家庭理财项目的目标'); return false}
+
+        $.ajax({
+            url: '{{ url_for('user.family_create') }}',
+            type: 'POST',
+            dataType: 'json',
+            data:{'name': name, 'goal': goal},
+            success: function (r) {
+                if(r['code']==0){location.reload();}
+                else{swalError(r['msg'])}
+            }
+        })
+    })
 });
 </script>
 {% endblock %}

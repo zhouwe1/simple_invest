@@ -110,6 +110,7 @@ class User(db.Model, UserMixin):
         else:
             goal_rate = 0
         asset_dict['goal_rate'] = goal_rate
+        asset_dict['total_amount'] = round(asset_dict.get('total_amount'), 2)
         cache.set(cache_key, asset_dict)
         return asset_dict
 
@@ -118,25 +119,37 @@ class Family(db.Model):
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(20))
     goal = db.Column(db.Integer(), default=0)
-    create_time = db.Column(db.DateTime(timezone=True))
-    update_time = db.Column(db.DateTime(timezone=True))
+    create_time = db.Column(db.DateTime(timezone=True), default=public.now)
+    update_time = db.Column(db.DateTime(timezone=True), default=public.now)
+    parent_id = db.Column(db.Integer())
     users = db.relationship(
         'User',
         backref='family',
         lazy='dynamic'
     )
 
-    def __init__(self, name, goal):
+    def __init__(self, parent_id, name, goal):
         """
         创建家庭
         :param name:
-        :param goal:
+        :param goal: 单位:分
         """
+        self.parent_id = parent_id,
         self.name = name
         self.goal = goal
+        self.create_time = public.now()
+        self.update_time = public.now()
         db.session.add(self)
-        db.session.commit()
+        db.session.flush()
 
     @property
     def goal_yuan(self):
         return int(self.goal / 100)
+
+    @property
+    def parent(self):
+        user = User.query.filter_by(id=self.parent_id).first()
+        if user:
+            return user.username
+        else:
+            return ''
