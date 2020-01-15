@@ -31,9 +31,17 @@
 <script type="text/javascript">
 $(function () {
     $('#uaFilter').change(function () {
-        let ua_id = $(this).val(),
-            url = '{{ url_for('analyse.trend_ua_detail', ua_id=0) }}'.replace(0, ua_id);
-        fill_trend_ua_chart(url)
+        let ua_id = $(this).val();
+        $('#uaTrend').remove();
+        $('.chart').html('<canvas id="uaTrend" style="height:300px; min-height:300px"></canvas>');
+        $.ajax({
+            url: '{{ url_for('analyse.trend_ua_detail', ua_id=0) }}'.replace(0, ua_id),
+            type: 'GET',
+            dataType: 'json',
+            success: function(r){
+                fill_trend_ua_chart(r['labels'], r['datas'])
+            },
+        })
     });
 });
 </script>
