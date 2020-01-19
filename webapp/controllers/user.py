@@ -122,7 +122,7 @@ def family_index():
         members = []
         for user in users:
             user_asset = user.asset_summary
-            goal_rate = round((user_asset.get('total_amount') / family_summary['goal_yuan']) * 100, 1)
+            goal_rate = round(user_asset.get('total_amount') / family_summary['goal_yuan'] * 100, 1)
             members.append({
                 'avatar': user.avatar,
                 'username': user.username,
@@ -134,6 +134,7 @@ def family_index():
             family_summary['count'] += 1
             family_summary['goal_rate'] += goal_rate
         family_summary['total_amount'] = round(family_summary['total_amount'], 2)
+        family_summary['goal_rate'] = round(family_summary['goal_rate'], 2)
         members.sort(key=lambda x: x.get('total_amount'), reverse=True)
     else:
         family_summary = {}
