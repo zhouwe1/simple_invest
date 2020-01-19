@@ -94,6 +94,10 @@ class UAAmount(db.Model):
     def clear_cache(model, operation):
         cache.delete('user_asset_summary_{}'.format(model.user_asset.user_id))
 
+    @property
+    def update_time_str(self):
+        return self.update_time.strftime("%m-%d %H:%M")
+
 
 class Agent(db.Model):
     """购买处(银行/基金公司/支付宝/微信)"""
