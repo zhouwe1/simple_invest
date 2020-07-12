@@ -53,16 +53,20 @@ class User(db.Model, UserMixin):
 
     @property
     def asset_summary(self):
+        """
+        用户支持概况
+        :return:
+        """
         cache_key = 'user_asset_summary_{}'.format(self.id)
         if cache.get(cache_key):
             return cache.get(cache_key)
 
-        asset_dict = {'goal': self.goal_yuan,
-                      'fp_count': 0,
-                      'total_amount': 0,
-                      'last_update': '',
-                      'agent_tuples': list(),
-                      'fptype_tuples': list(),
+        asset_dict = {'goal': self.goal_yuan,  # 金额目标
+                      'fp_count': 0,  # 理财产品数量
+                      'total_amount': 0,  # 总金额
+                      'last_update': '',  # 最后更新
+                      'agent_tuples': list(),  # 渠道数据 (名称，金额，理财产品数量)
+                      'fptype_tuples': list(),  # 理财类型数据 (名称，金额，理财产品数量)
                       }
         agent_dict = dict()
         fptype_dict = dict()
@@ -114,6 +118,14 @@ class User(db.Model, UserMixin):
         asset_dict['total_amount'] = round(asset_dict.get('total_amount'), 2)
         cache.set(cache_key, asset_dict)
         return asset_dict
+
+    @property
+    def family_members(self):
+        """用户的家庭成员(包括用户本人)，如未加入家庭，则只有用户本人"""
+        if self.family_id:
+            return self.family.users.all()
+        else:
+            return [self]
 
 
 class Family(db.Model):

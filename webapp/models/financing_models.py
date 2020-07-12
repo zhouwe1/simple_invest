@@ -56,6 +56,9 @@ class UserAsset(db.Model):
 
 
 class UAAmount(db.Model):
+    """
+    用户理财产品金额变动历史
+    """
     id = db.Column(db.Integer(), primary_key=True)
     date = db.Column(db.Date())
     userasset_id = db.Column(db.Integer(), db.ForeignKey('user_asset.id', ondelete='RESTRICT'), nullable=False)
