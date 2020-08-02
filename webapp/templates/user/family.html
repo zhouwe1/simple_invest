@@ -11,23 +11,27 @@
     <div class="row">
         <div class="col-12">
             <h4>
-                <i class="fas fa-home"></i> {{ family.name }} <button type="button" class="btn btn-default btn-sm"><i class="fas fa-pencil-alt"></i></button>
+                <i class="fas fa-home"></i>
+                <span id="family_name">
+                    {{ family.name }}
+                    <button type="button" class="btn btn-default btn-sm family-name"><i class="fas fa-pencil-alt"></i></button>
+                </span>
             </h4>
         </div>
     </div>
     <div class="row">
         <div class="col-sm-6">
             <address>
-                <b>创建人:</b> {{ family.parent }}<br>
-                <b>创建时间:</b> {{ family.create_time }}<br>
-                <b>成员数量:</b> {{ family_summary.count }}
+                <p><b>创建人:</b> {{ family.parent }}</p>
+                <p><b>创建时间:</b> {{ family.create_time }}</p>
+                <p><b>成员数量:</b> {{ family_summary.count }}</p>
             </address>
         </div>
         <div class="col-sm-6">
             <address>
-                <b>家庭目标:</b> {{ family_summary.goal_yuan }} <button type="button" class="btn btn-default btn-xs"><i class="fas fa-pencil-alt"></i></button><br>
-                <b>家庭资产:</b> {{ family_summary.total_amount }}<br>
-                <b>理财产品:</b> {{ family_summary.fp_count }}
+                <p><b>家庭目标:</b> <span id="family_goal">{{ family_summary.goal_yuan }} <button type="button" class="btn btn-default btn-xs family-goal"><i class="fas fa-pencil-alt"></i></button></span></p>
+                <p><b>家庭资产:</b> {{ family_summary.total_amount }}</p>
+                <p><b>理财产品:</b> {{ family_summary.fp_count }}</p>
             </address>
         </div>
     </div>
@@ -137,7 +141,57 @@ $(function () {
                 else{swalError(r['msg'])}
             }
         })
-    })
+    });
+
+    {% if family %}
+    let body = $('body');
+    body.on('click', '.family-name', function () {
+        $('#family_name').html('<input type="text" id="family_name_input" maxlength="20" data-value={{ family.name }} value="{{ family.name }}">');
+        $('#family_name_input').focus();
+    });
+
+    body.on('blur', '#family_name_input', function () {
+        let new_family_name = $(this).val(),
+            old_family_name = $(this).attr('data-value');
+        if (new_family_name && new_family_name != old_family_name){
+            bootbox.confirm('名称已改变，需要保存吗?', function (result) {
+                if(result){
+                    alert('yes')
+                }
+                else{
+                    $('#family_name').html('{{ family.name }} <button type="button" class="btn btn-default btn-sm family-name"><i class="fas fa-pencil-alt"></i></button>')
+                }
+            })
+        }
+        else{
+            $('#family_name').html('{{ family.name }} <button type="button" class="btn btn-default btn-sm family-name"><i class="fas fa-pencil-alt"></i></button>')
+        }
+    });
+
+    body.on('click', '.family-goal', function () {
+        $('#family_goal').html('<input type="number" id="family_goal_input" style="height:100%;" min=0 data-value={{ family_summary.goal_yuan }} value="{{ family_summary.goal_yuan }}">');
+        $('#family_goal_input').focus();
+    });
+
+    body.on('blur', '#family_goal_input', function () {
+        let new_family_goal = $(this).val(),
+            old_family_goal = $(this).attr('data-value');
+        if (new_family_goal && new_family_goal != old_family_goal){
+            bootbox.confirm('目标已改变，需要保存吗?', function (result) {
+                if(result){
+                    alert('yes')
+                }
+                else{
+                    $('#family_goal').html('{{ family_summary.goal_yuan }} <button type="button" class="btn btn-default btn-xs family-goal"><i class="fas fa-pencil-alt"></i></button>')
+                }
+            })
+        }
+        else{
+            $('#family_goal').html('{{ family_summary.goal_yuan }} <button type="button" class="btn btn-default btn-xs family-goal"><i class="fas fa-pencil-alt"></i></button>')
+        }
+    });
+    {% endif %}
+
 });
 </script>
 {% endblock %}

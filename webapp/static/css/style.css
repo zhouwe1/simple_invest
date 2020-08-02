@@ -25,3 +25,8 @@
 .info-box .progress .progress-bar {
     background-color: green;
 }
+
+address p {
+    line-height: 30px;
+    margin-bottom: 0;
+}
