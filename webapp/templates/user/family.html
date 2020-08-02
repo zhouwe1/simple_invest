@@ -146,7 +146,7 @@ $(function () {
     {% if family %}
     let body = $('body');
     body.on('click', '.family-name', function () {
-        $('#family_name').html('<input type="text" id="family_name_input" maxlength="20" data-value={{ family.name }} value="{{ family.name }}">');
+        $('#family_name').html('<input type="text" id="family_name_input" maxlength="20" data-value="{{ family.name }}" value="{{ family.name }}">');
         $('#family_name_input').focus();
     });
 
@@ -169,7 +169,7 @@ $(function () {
     });
 
     body.on('click', '.family-goal', function () {
-        $('#family_goal').html('<input type="number" id="family_goal_input" style="height:100%;" min=0 data-value={{ family_summary.goal_yuan }} value="{{ family_summary.goal_yuan }}">');
+        $('#family_goal').html('<input type="number" id="family_goal_input" style="height:100%;" min=0 data-value="{{ family_summary.goal_yuan }}" value="{{ family_summary.goal_yuan }}">');
         $('#family_goal_input').focus();
     });
 
