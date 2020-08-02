@@ -156,7 +156,7 @@ $(function () {
         if (new_family_name && new_family_name != old_family_name){
             bootbox.confirm('名称已改变，需要保存吗?', function (result) {
                 if(result){
-                    alert('yes')
+                    family_update('name', new_family_name)
                 }
                 else{
                     $('#family_name').html('{{ family.name }} <button type="button" class="btn btn-default btn-sm family-name"><i class="fas fa-pencil-alt"></i></button>')
@@ -179,7 +179,7 @@ $(function () {
         if (new_family_goal && new_family_goal != old_family_goal){
             bootbox.confirm('目标已改变，需要保存吗?', function (result) {
                 if(result){
-                    alert('yes')
+                    family_update('goal', new_family_goal)
                 }
                 else{
                     $('#family_goal').html('{{ family_summary.goal_yuan }} <button type="button" class="btn btn-default btn-xs family-goal"><i class="fas fa-pencil-alt"></i></button>')
@@ -193,5 +193,21 @@ $(function () {
     {% endif %}
 
 });
+
+
+function family_update(key, value) {
+    $.ajax({
+        url: '',
+        type: 'POST',
+        data: {'key': key, 'value': value},
+        success: function (r) {
+            alert(r['msg']);
+            if (r['code']==0){
+                location.reload();
+            }
+        }
+    })
+}
+
 </script>
 {% endblock %}

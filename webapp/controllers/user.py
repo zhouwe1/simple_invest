@@ -112,39 +112,50 @@ def holdings_update():
             return jsonify({'code': 1, 'msg': '系统错误'})
 
 
-@user_blueprint.route('/family')
+@user_blueprint.route('/family', methods=['POST', 'GET'])
 @login_required
 def family_index():
     family = current_user.family
-    if family:
-        users = family.users.all()
-        family_summary = {'goal_yuan': family.goal_yuan, 'total_amount': 0, 'fp_count': 0, 'goal_rate': 0, 'count': 0}
-        members = []
-        for user in users:
-            user_asset = user.asset_summary
-            goal_rate = round(user_asset.get('total_amount') / family_summary['goal_yuan'] * 100, 1)
-            members.append({
-                'avatar': user.avatar,
-                'username': user.username,
-                'family_goal_rate': goal_rate,
-                **user_asset
-            })
-            family_summary['total_amount'] += user_asset.get('total_amount')
-            family_summary['fp_count'] += user_asset.get('fp_count')
-            family_summary['count'] += 1
-            family_summary['goal_rate'] += goal_rate
-        family_summary['total_amount'] = round(family_summary['total_amount'], 2)
-        family_summary['goal_rate'] = round(family_summary['goal_rate'], 2)
-        members.sort(key=lambda x: x.get('total_amount'), reverse=True)
-    else:
-        family_summary = {}
-        members = []
-    return render_template(
-        'user/family.html',
-        family=family,
-        family_summary=family_summary,
-        members=members,
-    )
+    if request.method == 'GET':
+        if family:
+            users = family.users.all()
+            family_summary = {'goal_yuan': family.goal_yuan, 'total_amount': 0, 'fp_count': 0, 'goal_rate': 0, 'count': 0}
+            members = []
+            for user in users:
+                user_asset = user.asset_summary
+                goal_rate = round(user_asset.get('total_amount') / family_summary['goal_yuan'] * 100, 1)
+                members.append({
+                    'avatar': user.avatar,
+                    'username': user.username,
+                    'family_goal_rate': goal_rate,
+                    **user_asset
+                })
+                family_summary['total_amount'] += user_asset.get('total_amount')
+                family_summary['fp_count'] += user_asset.get('fp_count')
+                family_summary['count'] += 1
+                family_summary['goal_rate'] += goal_rate
+            family_summary['total_amount'] = round(family_summary['total_amount'], 2)
+            family_summary['goal_rate'] = round(family_summary['goal_rate'], 2)
+            members.sort(key=lambda x: x.get('total_amount'), reverse=True)
+        else:
+            family_summary = {}
+            members = []
+        return render_template(
+            'user/family.html',
+            family=family,
+            family_summary=family_summary,
+            members=members,
+        )
+    elif request.method == 'POST':
+        form = request.form
+        if family:
+            key = form.get('key')
+            value = form.get('value')
+            if key == 'goal':
+                value = int(value) * 100
+            setattr(family, key, value)
+            db.session.commit()
+        return jsonify({'code': 0, 'msg': '修改成功'})
 
 
 @user_blueprint.route('/family/create', methods=['POST'])
