@@ -25,7 +25,7 @@ flask_app.register_blueprint(analyse_blueprint, url_prefix='/analyse')
 
 @flask_app.before_request
 def load_avatar():
-    if 'user_id' in session and 'avatar' not in session:
+    if '_user_id' in session and 'avatar' not in session:
         session['avatar'] = current_user.avatar
 
 
