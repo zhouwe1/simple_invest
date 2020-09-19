@@ -210,7 +210,7 @@ class FPAsset(db.Model):
 class FPType(db.Model):
     """
     理财产品类型
-    1银行存款 / 2货币基金 / 3债券基金 / 4股票基金 /  5股票 / 6银行理财 / 7保险理财 / 8黄金 / 9白银
+    1银行存款 / 2货币基金 / 3债券基金 / 4股票基金 /  5股票 / 6银行理财 / 7保险理财 / 8黄金 / 9白银 / 10现金
     """
     id = db.Column(db.Integer(), primary_key=True)
     name = db.Column(db.String(8), unique=True)
@@ -232,4 +232,5 @@ class FPType(db.Model):
             7: '保险理财',
             8: '黄金',
             9: '白银',
+            10: '现金',
         }
