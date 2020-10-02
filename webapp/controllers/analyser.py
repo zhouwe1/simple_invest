@@ -115,14 +115,12 @@ def scale():
         for member_fptype_list in family_members_fptype_list:
             for fptype in member_fptype_list:
                 fptype_name = fptype.get('name')
-                print('fptype_list', id(fptype_list), fptype_list)
                 if fptype_name in family_fptype_dict:
                     family_fptype_dict[fptype_name]['amount'] += fptype.get('amount')
                     family_fptype_dict[fptype_name]['count'] += fptype.get('count')
                 else:
                     family_fptype_dict[fptype_name] = fptype.copy()
                 family_fptype_dict[fptype_name]['rate'] = round(family_fptype_dict[fptype_name]['amount'] / family_amount * 100, 2)
-            print('fptype_list', id(fptype_list), fptype_list)
         family_fptype_list = list(family_fptype_dict.values())
         family_fptype_list.sort(key=lambda x: x.get('amount'), reverse=True)
     else:
