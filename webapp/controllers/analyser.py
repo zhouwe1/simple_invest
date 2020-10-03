@@ -65,10 +65,18 @@ def trend_amount_data():
 
     labels = []
     datas = []
-    for date_uaa in uaa_list:
+    differences = []
+    compare_target = 0
+    for index, date_uaa in enumerate(uaa_list):
+        amount = round(date_uaa.get('amount'), 2)
         labels.append('{}({})'.format(date_uaa.get('date'), date_uaa.get('count')))
-        datas.append(round(date_uaa.get('amount'), 2))
-    return jsonify({'code': 0, 'labels': labels, 'datas': datas})
+        datas.append(amount)
+        if index:
+            differences.append(round((amount - compare_target), 2))
+        else:
+            differences.append(0)
+        compare_target = amount
+    return jsonify({'code': 0, 'labels': labels, 'datas': datas, 'differences': differences})
 
 
 @analyse_blueprint.route('/scale')

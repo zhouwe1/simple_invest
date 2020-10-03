@@ -151,14 +151,24 @@ function fill_trend_amount_chart(url) {
                 labels  : r['labels'],
                 datasets: [
                     {
-                        backgroundColor     : 'rgba(60,141,188,0.9)',
-                        borderColor         : 'rgba(60,141,188,0.8)',
+                        backgroundColor     : "rgba(184,91,91,0.9)",
+                        borderColor         : "rgba(184,91,91,0.8)",
+                        pointBackgroundColor: "rgb(197,219,241)",
+                        pointBorderColor    : "rgb(184,91,91)",
+                        data                : r['differences'],
+                        label               : "环比增长"
+                    },
+                    {
+                        backgroundColor     : "rgba(60,141,188,0.9)",
+                        borderColor         : "rgba(60,141,188,0.8)",
                         pointBackgroundColor: "rgb(197,219,241)",
                         pointBorderColor    : "rgb(1,84,114)",
-                        data                : r['datas']
+                        data                : r['datas'],
+                        label               : "金额"
                     },
                 ]
             };
+            areaChartOptions['legend'] = {display: true}
             new Chart(areaChartCanvas, {
                 type: 'line',
                 data: areaChartData,
@@ -180,7 +190,8 @@ function fill_trend_ua_chart(labels, datas) {
                     borderColor         : 'rgba(60,141,188,0.8)',
                     pointBackgroundColor: "rgb(197,219,241)",
                     pointBorderColor    : "rgb(1,84,114)",
-                    data                : datas
+                    data                : datas,
+                    label               : "金额"
                 },
             ]
         };
