@@ -20,13 +20,14 @@ class Config:
     SECRET_KEY = 'S02sS*SJ:#BSH@5sb2#=_23 ^s5<$.>2(#@'
 
     # 数据库
-    SQLALCHEMY_DATABASE_URI = "mysql+pymysql://{user}:{pw}@{host}:{port}/{db}?charset=utf8mb4".format(
-        user=try_get('database', 'user'),
-        pw=try_get('database', 'pass'),
-        host=try_get('database', 'host'),
-        port=try_get('database', 'port'),
-        db=try_get('database', 'db')
-    )
+    # SQLALCHEMY_DATABASE_URI = "mysql+pymysql://{user}:{pw}@{host}:{port}/{db}?charset=utf8mb4".format(
+    #     user=try_get('database', 'user'),
+    #     pw=try_get('database', 'pass'),
+    #     host=try_get('database', 'host'),
+    #     port=try_get('database', 'port'),
+    #     db=try_get('database', 'db')
+    # )
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///financing.db'
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     SQLALCHEMY_ECHO = False
     SQLALCHEMY_POOL_PRE_PING = True
