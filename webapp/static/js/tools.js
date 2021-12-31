@@ -1,6 +1,6 @@
 $(function () {
     refresh_sidebar();
-    //load_avatar(user_avatar);
+    load_avatar(user_avatar);
 
     $('.tr-clone').click(function () {
         let clone_tr = $('#dataTbody .clone-tr');
