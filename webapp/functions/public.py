@@ -1,14 +1,18 @@
-from libgravatar import Gravatar
 from datetime import datetime
 import pytz
+from hashlib import md5
 
 TIMEZONE = pytz.timezone('Asia/Shanghai')
 
 
 def get_avatar(email):
     """获取用户头像"""
-    g = Gravatar(email)
-    return g.get_image(size=84, default='mm')
+    url = '//cravatar.cn/avatar/' + cravatar_hash(email)
+    return url
+
+
+def cravatar_hash(email):
+    return md5(email.encode()).hexdigest()
 
 
 def now():
