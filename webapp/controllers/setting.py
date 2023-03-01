@@ -66,7 +66,7 @@ def fp_index():
     if form.get('type'):
         query_dict['type_id'] = form.get('type')
 
-    fps = FinancialProduct.query.filter_by(**query_dict).order_by(desc('id')).all()
+    fps = FinancialProduct.query.filter_by(**query_dict).order_by(desc('name')).all()
     return render_template(
         'setting/fp_index.html',
         fps=fps,
