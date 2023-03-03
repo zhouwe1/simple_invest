@@ -1,8 +1,7 @@
 import logging.handlers
-import os.path
 from webapp.config import BASE_DIR
 from concurrent_log_handler import ConcurrentRotatingFileHandler
-file = os.path.join(BASE_DIR, 'log', 'webapp.log')
+file = BASE_DIR / 'log/webapp.log'
 
 logger_handle = ConcurrentRotatingFileHandler(file, maxBytes=1024*1024*10, backupCount=5, encoding='utf-8')
 

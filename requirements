@@ -1,7 +1,6 @@
 Flask
 Flask-Alembic
 Flask-SQLAlchemy
-PyMySQL
 Flask-Login
 pytz
 concurrent-log-handler
