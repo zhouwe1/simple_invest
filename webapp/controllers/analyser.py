@@ -112,8 +112,6 @@ def trend_family_amount_data():
         else:
             date_dict[user_id][date] = uaa.amount_yuan
     labels = sorted(list(labels))
-    print(labels)
-    print(date_dict)
     datas = []
     temp_data = {f'user_{u}': 0 for u in user_ids}
     for date in labels:
@@ -123,7 +121,6 @@ def trend_family_amount_data():
                 temp_data[f'user_{user_id}'] = date_dict[user_id][date]
             _date_amount += temp_data[f'user_{user_id}']
         datas.append(round(_date_amount,2))
-    print(len(labels), len(datas))
     return jsonify({'code': 0, 'labels': labels, 'datas': datas, 'differences': []})
 
 
