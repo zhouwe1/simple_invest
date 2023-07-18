@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content_header %}
-    总额趋势
+    {{ title }}
 {% endblock %}
 
 {% block content %}
@@ -22,7 +22,11 @@
 {% block footer_script %}
 <script type="text/javascript">
 $(function () {
-    fill_trend_amount_chart('{{ url_for('analyse.trend_amount_data') }}');
+    {% if request.path == '/analyse/trend/amount' %}
+        fill_trend_amount_chart('{{ url_for('analyse.trend_amount_data') }}');
+    {% else %}
+        fill_trend_amount_chart('{{ url_for('analyse.trend_family_amount_data') }}');
+    {% endif %}
 })
 </script>
 {% endblock %}

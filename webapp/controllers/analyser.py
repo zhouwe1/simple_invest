@@ -38,7 +38,10 @@ def trend_ua_detail(ua_id):
 @login_required
 def trend_amount_index():
     """用户总额趋势-页面"""
-    return render_template('analyse/trend_amount.html')
+    return render_template(
+        'analyse/trend_amount.html',
+        title='总额趋势',
+    )
 
 
 @analyse_blueprint.route('/trend/amount/data')
@@ -77,6 +80,51 @@ def trend_amount_data():
             differences.append(0)
         compare_target = amount
     return jsonify({'code': 0, 'labels': labels, 'datas': datas, 'differences': differences})
+
+
+@analyse_blueprint.route('/trend/family/amount')
+@login_required
+def trend_family_amount_index():
+    """家庭总额趋势-页面"""
+    return render_template(
+        'analyse/trend_amount.html',
+        title='家庭总额趋势',
+    )
+
+
+@analyse_blueprint.route('/trend/family/amount/data')
+@login_required
+def trend_family_amount_data():
+    """家庭总额趋势-数据"""
+    family = current_user.family
+    user_ids = [u.id for u in family.users]
+    uaas = UAAmount.query.join(UserAsset).filter(
+        UserAsset.user_id.in_(user_ids), UserAsset.id == UAAmount.userasset_id).all()
+
+    labels = set()
+    date_dict = {u: {} for u in user_ids}
+    for uaa in uaas:
+        user_id = uaa.user_asset.user_id
+        date = uaa.date.strftime('%Y-%m-%d')
+        labels.add(date)
+        if date in date_dict[user_id]:
+            date_dict[user_id][date] += uaa.amount_yuan
+        else:
+            date_dict[user_id][date] = uaa.amount_yuan
+    labels = sorted(list(labels))
+    print(labels)
+    print(date_dict)
+    datas = []
+    temp_data = {f'user_{u}': 0 for u in user_ids}
+    for date in labels:
+        _date_amount = 0
+        for user_id in user_ids:
+            if date_dict[user_id].get(date):
+                temp_data[f'user_{user_id}'] = date_dict[user_id][date]
+            _date_amount += temp_data[f'user_{user_id}']
+        datas.append(round(_date_amount,2))
+    print(len(labels), len(datas))
+    return jsonify({'code': 0, 'labels': labels, 'datas': datas, 'differences': []})
 
 
 @analyse_blueprint.route('/scale')
