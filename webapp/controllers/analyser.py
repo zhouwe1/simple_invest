@@ -113,15 +113,23 @@ def trend_family_amount_data():
             date_dict[user_id][date] = uaa.amount_yuan
     labels = sorted(list(labels))
     datas = []
+    differences = []
+    compare_target = 0
     temp_data = {f'user_{u}': 0 for u in user_ids}
-    for date in labels:
+    for index, date in enumerate(labels):
         _date_amount = 0
         for user_id in user_ids:
             if date_dict[user_id].get(date):
                 temp_data[f'user_{user_id}'] = date_dict[user_id][date]
             _date_amount += temp_data[f'user_{user_id}']
-        datas.append(round(_date_amount,2))
-    return jsonify({'code': 0, 'labels': labels, 'datas': datas, 'differences': []})
+
+        if index:
+            differences.append(round((_date_amount - compare_target), 2))
+        else:
+            differences.append(0)
+        compare_target = _date_amount
+        datas.append(round(_date_amount, 2))
+    return jsonify({'code': 0, 'labels': labels, 'datas': datas, 'differences': differences})
 
 
 @analyse_blueprint.route('/scale')
