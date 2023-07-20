@@ -79,24 +79,32 @@ def fp_index():
 def fp_update():
     form = request.form
     fp_id = form.get('id')
-    name = form.get('name')
-    fp_type = form.get('fp_type', 0, type=int)
-    fp_code = form.get('fp_code') or None
+    name = form.get('name').strip()
+    fp_type = form.get('fp_type', type=int)
+    fp_code = form.get('fp_code').strip()
 
-    if FinancialProduct.query.filter(FinancialProduct.name == name, FinancialProduct.id != fp_id).count():
+    if fp_code in ('', '0'):
+        fp_code = None
+
+    if FinancialProduct.query.filter(FinancialProduct.name == name, FinancialProduct.id != fp_id).first():
         return jsonify({'code': 1, 'msg': '名称重复'})
 
-    if fp_type in (3, 4) and not fp_code:
-        return jsonify({'code': 1, 'msg': '股票或基金请填写代码'})
+    if fp_type in (3, 4, 5, 9):
+        if not fp_code:
+            return jsonify({'code': 1, 'msg': '股票或基金请填写代码'})
+        if len(fp_code) != 6:
+            return jsonify({'code': 1, 'msg': '股票或基金代码不正确'})
 
     if fp_code:
-        if FinancialProduct.query.filter(FinancialProduct.code == fp_code, FinancialProduct.id != fp_id).count():
+        if FinancialProduct.query.filter(FinancialProduct.code == fp_code, FinancialProduct.id != fp_id).first():
             return jsonify({'code': 1, 'msg': '代码重复'})
     if fp_id == '0':
         fp = FinancialProduct(name=name, code=fp_code, type_id=fp_type)
     else:
         fp = FinancialProduct.query.filter_by(id=fp_id).first()
         fp.name = name
+        fp.type_id = fp_type
+        fp.code = fp_code
         db.session.commit()
     return jsonify({'code': 0, 'name': fp.name, 'id': fp.id, 'fp_type': fp.type.name, 'fp_code': fp.code})
 

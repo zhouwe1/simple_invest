@@ -34,10 +34,10 @@
             </thead>
             <tbody id="dataTbody">
             {% for fp in fps %}
-                <tr data-id="{{ fp.id }}" data-name="{{ fp.name }}" data-type="" data-code="{{ fp.code }}">
+                <tr data-id="{{ fp.id }}" data-name="{{ fp.name }}" data-type-id={{ fp.type.id }} data-type-name="{{ fp.type.name }}" data-code="{{ fp.code|default('', True) }}">
                     <td class="td-name">{{ fp.name }}</td>
-                    <td>{{ fp.type.name }}</td>
-                    <td>{{ fp.code|default('', True) }}</td>
+                    <td class="td-type">{{ fp.type.name }}</td>
+                    <td class="td-code">{{ fp.code|default('', True) }}</td>
                     <td>
                         <button type="button" class="btn btn-info tr-update"><i class="fas fa-pencil-alt"></i></button>
                         <button type="button" class="btn btn-success tr-submit d-none"><i class="fa fa-check"></i></button>
@@ -82,6 +82,7 @@
 <script type="text/javascript">
 $(function () {
     let dataTbody = $('#dataTbody');
+    let type_html = '<select class="form-control" name="type">{% for fpt_id, fpt_name in fp_types.items() %}<option value="{{ fpt_id }}">{{ fpt_name }}</option>{% endfor %}</select>';
 
     dataTbody.on('click', '.tr-submit', function () {
         let tr = $(this).parents('tr');
@@ -91,9 +92,16 @@ $(function () {
     dataTbody.on('click', '.tr-update', function(){
         let tr = $(this).parents('tr'),
             name_td = tr.find('.td-name'),
-            name = tr.attr('data-name');
+            type_td = tr.find('.td-type'),
+            code_td = tr.find('.td-code'),
+            name = tr.attr('data-name'),
+            type_id = tr.attr('data-type-id'),
+            code = tr.attr('data-code');
         name_td.html('<input type="text" name="name" maxlength="32" class="form-control"' +
             ' value="' + name + '" placeholder="请输入名称" autocomplete="off">');
+        type_td.html(type_html);
+        type_td.find('select').val(type_id);
+        code_td.html('<input type="text" name="code" class="form-control" value="' + code + '" maxlength="6" minlength="6" placeholder="基金/股票" autocomplete="off">');
         tr.find('.tr-update').addClass('d-none');
         tr.find('.tr-submit').removeClass('d-none');
         tr.find('.tr-delete').addClass('d-none');
@@ -103,8 +111,14 @@ $(function () {
     dataTbody.on('click', '.tr-cancel', function(){
         let tr = $(this).parents('tr'),
             name_td = tr.find('.td-name'),
-            name = tr.attr('data-name');
+            type_td = tr.find('.td-type'),
+            code_td = tr.find('.td-code'),
+            name = tr.attr('data-name'),
+            type_name = tr.attr('data-type-name'),
+            code = tr.attr('data-code');
         name_td.text(name);
+        type_td.text(type_name);
+        code_td.text(code);
         tr.find('.tr-update').removeClass('d-none');
         tr.find('.tr-submit').addClass('d-none');
         tr.find('.tr-delete').removeClass('d-none');
@@ -159,7 +173,8 @@ $(function () {
 
 function fpUpdate(tr) {
     // 理财产品添加或修改
-    let id = tr.attr('data-id'),
+    let code_types=new Array([3, 4, 5, 9]),
+        id = tr.attr('data-id'),
         submit_btn = tr.find('.tr-submit'),
         update_btn = tr.find('.tr-update'),
         cancel_btn = tr.find('.tr-cancel'),
@@ -167,28 +182,31 @@ function fpUpdate(tr) {
         name_input = tr.find('input[name="name"]'),
         code_input = tr.find('input[name="code"]'),
         old_name = tr.attr('data-name'),
+        old_type_id = tr.attr('data-type-id'),
+        old_type_name = tr.attr('data-type-name'),
+        old_code = tr.attr('data-code'),
         new_name = name_input.val(),
         new_type = tr.find('select').val(),
         new_code = code_input.val();
     if(!new_name){return false}
-    if(new_name == old_name){
+    if(new_name == old_name && new_type == old_type_id && new_code == old_code){
         submit_btn.addClass('d-none');  //隐藏保存按钮
         update_btn.removeClass('d-none');  //显示修改按钮
         cancel_btn.addClass('d-none');
         delete_btn.removeClass('d-none');
         tr.children('.td-name').text(old_name);
+        tr.children('.td-type').text(old_type_name);
+        tr.children('.td-code').text(old_code);
         return true
     }
 
-    if(new_type == 3 || new_type == 4){
-        if (!new_code){
-            tr.addClass('tr-error');
-            setInterval(function () {
-                tr.removeClass('tr-error')
-            }, 500);
-            swalError('股票或基金请填写代码');
-            return false
-        }
+    if (code_types.includes(new_type) || !new_code){
+        tr.addClass('tr-error');
+        setInterval(function () {
+            tr.removeClass('tr-error')
+        }, 500);
+        swalError('股票或基金请填写代码');
+        return false
     }
 
     submit_btn.html('<i class="fa fa-spinner fa-pulse"></>');  //把保存按钮改成loading图标
@@ -205,8 +223,10 @@ function fpUpdate(tr) {
                 setInterval(function () {
                     tr.removeClass('tr-success')
                 }, 1000);
-                tr.attr('data-id', r['id']);
                 tr.attr('data-name', r['name']);
+                tr.attr('data-type-id', new_type);
+                tr.attr('data-type-name', r['fp_type']);
+                tr.attr('data-code', r['fp_code']);
                 tr.find('.td-name').text(r['name']);
                 tr.find('.td-type').text(r['fp_type']);
                 tr.find('.td-code').text(r['fp_code']);
@@ -215,7 +235,7 @@ function fpUpdate(tr) {
                 delete_btn.removeClass('d-none');
                 tr.removeClass('clone-tr');
                 submit_btn.addClass('d-none');  //隐藏保存按钮
-                submit_btn.text('提交');
+                submit_btn.html('<i class="fa fa-check"></i>');
                 submit_btn.removeAttr('disabled');
             }
             else{
@@ -223,7 +243,7 @@ function fpUpdate(tr) {
                 setInterval(function () {
                     tr.removeClass('tr-error')
                 }, 1000);
-                submit_btn.text('提交');
+                submit_btn.html('<i class="fa fa-check"></i>');
                 submit_btn.removeAttr('disabled');
                 swalError(r['msg'])
             }

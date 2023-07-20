@@ -184,7 +184,7 @@ function agentUpdate(tr) {
                     tr.removeClass('tr-error')
                 }, 500);
                 name_input.val(old_name);
-                submit_btn.text('提交');
+                submit_btn.text('<i class="fas fa-check"></i>');
                 submit_btn.removeAttr('disabled');
                 swalError(r['msg'])
             }
