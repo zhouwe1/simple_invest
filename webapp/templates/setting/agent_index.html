@@ -58,9 +58,9 @@ $(function () {
     let dataTbody = $('#dataTbody');
 
     dataTbody.on('click', '.tr-update', function () {
-        let tr = $(this).parents('tr'),
-            name_td = tr.find('.td-name'),
-            name = tr.attr('data-name');
+        let tr=$(this).parents('tr'),
+            name_td=tr.find('.td-name'),
+            name=tr.attr('data-name');
         $(this).addClass('d-none');  //隐藏修改按钮
         tr.find('.tr-delete').addClass('d-none');  //隐藏删除按钮
         tr.find('.tr-cancel').removeClass('d-none');  //显示保存按钮
@@ -86,107 +86,74 @@ $(function () {
 
     dataTbody.on('click', '.tr-delete', function () {
         let tr =$(this).parents('tr'),
-            id = tr.attr('data-id');
+            id=tr.attr('data-id'),
+            delete_btn=getDeleteBtn(tr);
         if(tr.hasClass('clone-tr')){tr.remove()}
         else{
             tr.addClass('tr-danger');
             bootbox.confirm('确认删除吗？', function (result) {
                 if(result){
-                    tr.find('.tr-delete').attr('disabled', 'disabled');
-                    tr.find('.tr-delete').html('<i class="fa fa-spinner fa-pulse"></>');
-
+                    disableBtn(delete_btn);
                     $.ajax({
-                        url: '{{ url_for('setting.agent_delete') }}',
-                        type: 'GET',
-                        dataType: 'json',
-                        data: {'id': id},
-                        success: function (r) {
-                            if(r['code']==0){
-                                setInterval(function () {
-                                tr.remove();
-                                }, 500);
-                            }
+                        url:'{{ url_for('setting.agent_delete') }}',
+                        type:'GET',
+                        dataType:'json',
+                        data:{'id':id},
+                        success:function(r){
+                            if(r['code']===0){trRemove(tr)}
                             else{
-                                swalError(r['msg']);
                                 tr.removeClass('tr-danger');
-                                tr.addClass('tr-error');
-                                setInterval(function () {
-                                    tr.removeClass('tr-error');
-                                }, 500);
-                                tr.find('.tr-delete').html('<i class="fas fa-trash"></i>');
-                                tr.find('.tr-delete').removeAttr('disabled');
+                                trError(tr, r['msg']);
+                                resumeBtn(delete_btn,'d')
                             }
                         }
-
                     })
-                }
-                else{
-                    tr.removeClass('tr-danger');
-                }
+                }else{tr.removeClass('tr-danger')}
             })
         }
-
     })
 });
 
 
 function agentUpdate(tr) {
-    let submit_btn = tr.find('.tr-submit'),
-        update_btn = tr.find('.tr-update'),
-        cancel_btn = tr.find('.tr-cancel'),
-        delete_btn = tr.find('.tr-delete'),
+    let submit_btn=getSubmitBtn(tr),
+        update_btn=getUpdateBtn(tr),
+        cancel_btn=getCancelBtn(tr),
+        delete_btn=getDeleteBtn(tr),
         id = tr.attr('data-id'),
         name_input = tr.find('input[name="name"]'),
         old_name = tr.attr('data-name'),
         new_name = name_input.val();
-
     if(!new_name){return false}
-
-    if(new_name == old_name){
-        submit_btn.addClass('d-none');  //隐藏保存按钮
-        update_btn.removeClass('d-none');  //显示修改按钮
-        cancel_btn.addClass('d-none');
-        delete_btn.removeClass('d-none');
+    if(new_name===old_name){
+        hideBtns([submit_btn,cancel_btn]);
+        showBtns([update_btn,delete_btn]);
         tr.children('.td-name').text(old_name);
         return true
     }
-
-    submit_btn.html('<i class="fa fa-spinner fa-pulse"></>');  //把保存按钮改成loading图标
-    submit_btn.attr('disabled', 'disabled');  //保存按钮disabled
+    disableBtn(submit_btn);
 
     $.ajax({
-        url: '{{ url_for('setting.agent_update') }}',
-        type: 'POST',
-        dataType: 'json',
-        data: {'id': id, 'name': new_name},
-        success: function (r) {
-            if(r['code']==0){
-                tr.addClass('tr-success');
-                setInterval(function () {
-                    tr.removeClass('tr-success')
-                }, 500);
-                update_btn.removeAttr('disabled');
-                update_btn.html('<i class="fas fa-pencil-alt"></i>');
-                cancel_btn.addClass('d-none');
-                delete_btn.removeClass('d-none');
+        url:'{{ url_for('setting.agent_update') }}',
+        type:'POST',
+        dataType:'json',
+        data:{'id': id, 'name': new_name},
+        success:function(r) {
+            if(r['code']===0){
+                trSuccess(tr);
                 tr.attr('data-id', r['id']);
                 tr.attr('data-name', r['name']);
                 tr.children('.td-name').text(r['name']);
                 tr.removeClass('clone-tr');
-                submit_btn.addClass('d-none');  //隐藏保存按钮
-                submit_btn.html('<i class="fas fa-check"></i>');
-                submit_btn.removeAttr('disabled');
-                update_btn.removeClass('d-none');  //显示修改按钮
+                resumeBtn(update_btn, 'u');
+                resumeBtn(submit_btn, 's');
+                showBtns([delete_btn, update_btn]);
+                hideBtns([cancel_btn, submit_btn]);
             }
             else{
-                tr.addClass('tr-error');
-                setInterval(function () {
-                    tr.removeClass('tr-error')
-                }, 500);
+                trError(tr,r['msg']);
                 name_input.val(old_name);
-                submit_btn.text('<i class="fas fa-check"></i>');
-                submit_btn.removeAttr('disabled');
-                swalError(r['msg'])
+                resumeBtn(submit_btn,'s')
             }
         }
     })

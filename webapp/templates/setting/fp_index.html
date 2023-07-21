@@ -126,47 +126,32 @@ $(function () {
     });
 
     dataTbody.on('click', '.tr-delete', function () {
-        let tr =$(this).parents('tr'),
-            id = tr.attr('data-id');
+        let tr=$(this).parents('tr'),
+            id=tr.attr('data-id'),
+            delete_btn=getDeleteBtn(tr);
         if(tr.hasClass('clone-tr')){tr.remove()}
         else{
             tr.addClass('tr-danger');
             bootbox.confirm('确认删除吗？', function (result) {
                 if(result){
-                    tr.find('.tr-delete').attr('disabled', 'disabled');
-                    tr.find('.tr-delete').html('<i class="fa fa-spinner fa-pulse"></>');
-
+                    disableBtn(delete_btn);
                     $.ajax({
                         url: '{{ url_for('setting.fp_delete') }}',
                         type: 'GET',
                         dataType: 'json',
                         data: {'id': id},
                         success: function (r) {
-                            if(r['code']==0){
-                                setInterval(function () {
-                                tr.remove();
-                                }, 500);
-                            }
+                            if(r['code']===0){trRemove(tr)}
                             else{
-                                swalError(r['msg']);
                                 tr.removeClass('tr-danger');
-                                tr.addClass('tr-error');
-                                setInterval(function () {
-                                    tr.removeClass('tr-error');
-                                }, 500);
-                                tr.find('.tr-delete').html('<i class="fas fa-trash"></i>');
-                                tr.find('.tr-delete').removeAttr('disabled');
+                                trError(tr,r['msg'])
+                                resumeBtn(delete_btn,'d')
                             }
                         }
-
                     })
-                }
-                else{
-                    tr.removeClass('tr-danger');
-                }
+                }else{tr.removeClass('tr-danger')}
             })
         }
-
     })
 });
 
@@ -175,10 +160,10 @@ function fpUpdate(tr) {
     // 理财产品添加或修改
     let code_types=new Array([3, 4, 5, 9]),
         id = tr.attr('data-id'),
-        submit_btn = tr.find('.tr-submit'),
-        update_btn = tr.find('.tr-update'),
-        cancel_btn = tr.find('.tr-cancel'),
-        delete_btn = tr.find('.tr-delete'),
+        submit_btn = getSubmitBtn(tr),
+        update_btn = getUpdateBtn(tr),
+        cancel_btn = getCancelBtn(tr),
+        delete_btn = getDeleteBtn(tr),
         name_input = tr.find('input[name="name"]'),
         code_input = tr.find('input[name="code"]'),
         old_name = tr.attr('data-name'),
@@ -189,28 +174,20 @@ function fpUpdate(tr) {
         new_type = tr.find('select').val(),
         new_code = code_input.val();
     if(!new_name){return false}
-    if(new_name == old_name && new_type == old_type_id && new_code == old_code){
-        submit_btn.addClass('d-none');  //隐藏保存按钮
-        update_btn.removeClass('d-none');  //显示修改按钮
-        cancel_btn.addClass('d-none');
-        delete_btn.removeClass('d-none');
+    if(new_name === old_name && new_type === old_type_id && new_code === old_code){
+        showBtns([update_btn,delete_btn]);
+        hideBtns([submit_btn,cancel_btn]);
         tr.children('.td-name').text(old_name);
         tr.children('.td-type').text(old_type_name);
         tr.children('.td-code').text(old_code);
         return true
     }
 
-    if (code_types.includes(new_type) || !new_code){
-        tr.addClass('tr-error');
-        setInterval(function () {
-            tr.removeClass('tr-error')
-        }, 500);
-        swalError('股票或基金请填写代码');
+    if (code_types.includes(new_type) && !new_code){
+        trError(tr,'股票或基金请填写代码')
         return false
     }
-
-    submit_btn.html('<i class="fa fa-spinner fa-pulse"></>');  //把保存按钮改成loading图标
-    submit_btn.attr('disabled', 'disabled');  //保存按钮disabled
+    disableBtn(submit_btn);{# 保存按钮disabled #}
 
     $.ajax({
         url: '{{ url_for('setting.fp_update') }}',
@@ -218,11 +195,8 @@ function fpUpdate(tr) {
         dataType: 'json',
         data: {'id': id, 'name': new_name, 'fp_type': new_type, 'fp_code': new_code},
         success: function (r) {
-            if(r['code']==0){
-                tr.addClass('tr-success');
-                setInterval(function () {
-                    tr.removeClass('tr-success')
-                }, 1000);
+            if(r['code']===0){
+                trSuccess(tr)
                 tr.attr('data-name', r['name']);
                 tr.attr('data-type-id', new_type);
                 tr.attr('data-type-name', r['fp_type']);
@@ -230,22 +204,14 @@ function fpUpdate(tr) {
                 tr.find('.td-name').text(r['name']);
                 tr.find('.td-type').text(r['fp_type']);
                 tr.find('.td-code').text(r['fp_code']);
-                update_btn.removeClass('d-none');
-                cancel_btn.addClass('d-none');
-                delete_btn.removeClass('d-none');
+                hideBtns([cancel_btn,submit_btn]);
+                showBtns([update_btn,delete_btn]);
                 tr.removeClass('clone-tr');
-                submit_btn.addClass('d-none');  //隐藏保存按钮
-                submit_btn.html('<i class="fa fa-check"></i>');
-                submit_btn.removeAttr('disabled');
+                resumeBtn(submit_btn,'s');
             }
             else{
-                tr.addClass('tr-error');
-                setInterval(function () {
-                    tr.removeClass('tr-error')
-                }, 1000);
-                submit_btn.html('<i class="fa fa-check"></i>');
-                submit_btn.removeAttr('disabled');
-                swalError(r['msg'])
+                trError(tr, r['msg'])
+                resumeBtn(submit_btn,'s')
             }
         }
     })

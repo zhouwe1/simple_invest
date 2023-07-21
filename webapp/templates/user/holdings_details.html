@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content_header %}
-{#    理财产品明细#}
+    理财产品明细
 {% endblock %}
 
 {% block content %}
@@ -116,64 +116,48 @@ $(function () {
 
     table.on('click', '.tr-cancel', function(){
         let tr = $(this).parents('tr'),
+            submit_btn = getSubmitBtn(tr),
+            update_btn = getUpdateBtn(tr),
+            delete_btn = getDeleteBtn(tr),
+            cancel_btn = getCancelBtn(tr),
             id=tr.attr('data-id'),
             name=tr.attr('data-name'),
             amount = tr.attr('data-amount'),
             expiration = tr.attr('data-expiration');
 
-        if(id=='0'){
-            resetNewTbody();
-            return false
-        }
+        if(id==='0'){resetNewTbody();return false}
         tr.find('.td-name').text(name);
         tr.find('.td-amount').text(amount);
         tr.find('.td-expiration').text(expiration);
-
-        tr.find('.tr-update').removeClass('d-none');
-        tr.find('.tr-submit').addClass('d-none');
-        tr.find('.tr-cancel').addClass('d-none');
-        tr.find('.tr-delete').removeClass('d-none');
+        hideBtns([submit_btn,cancel_btn]);
+        showBtns([delete_btn,update_btn]);
     });
 
     table.on('click', '.tr-delete', function () {
-        let tr =$(this).parents('tr'),
-            id = tr.attr('data-id');
+        let tr=$(this).parents('tr'),
+            id=tr.attr('data-id'),
+            delete_btn=getDeleteBtn(tr);
         if(tr.hasClass('clone-tr')){tr.remove()}
         else{
             tr.addClass('tr-danger');
-            bootbox.confirm('确认删除吗？', function (result) {
+            bootbox.confirm('确认删除吗？',function(result){
                 if(result){
-                    tr.find('.tr-delete').attr('disabled', 'disabled');
-                    tr.find('.tr-delete').html('<i class="fa fa-spinner fa-pulse"></>');
-
+                    disableBtn(delete_btn);
                     $.ajax({
                         url: '{{ url_for('user.holdings_details_delete') }}',
                         type: 'DELETE',
                         dataType: 'json',
                         data: {'id': id},
                         success: function (r) {
-                            if(r['code']==0){
-                                setInterval(function () {
-                                tr.remove();
-                                }, 500);
-                            }
+                            if(r['code']===0){trRemove(tr)}
                             else{
-                                swalError(r['msg']);
                                 tr.removeClass('tr-danger');
-                                tr.addClass('tr-error');
-                                setInterval(function () {
-                                    tr.removeClass('tr-error');
-                                }, 500);
-                                tr.find('.tr-delete').html('<i class="fas fa-trash"></i>');
-                                tr.find('.tr-delete').removeAttr('disabled');
+                                trError(tr, r['msg']);
+                                resumeBtn(delete_btn,'d')
                             }
                         }
                     })
-
-                }
-                else{
-                    tr.removeClass('tr-danger');
-                }
+                }else{tr.removeClass('tr-danger')}
             })
         }
     })
@@ -193,10 +177,10 @@ function resetNewTbody() {
 function detailUpdate(tr) {
     let error_ct = 0,
         id = tr.attr('data-id'),
-        submit_btn = tr.find('.tr-submit'),
-        update_btn = tr.find('.tr-update'),
-        cancel_btn = tr.find('.tr-cancel'),
-        delete_ntm = tr.find('.tr-delete'),
+        submit_btn = getSubmitBtn(tr),
+        update_btn = getUpdateBtn(tr),
+        cancel_btn = getCancelBtn(tr),
+        delete_ntm = getDeleteBtn(tr),
         ua = tr.find('input[name="new_ua"]').val(),
         name = tr.find('input[name="name"]').val(),
         amount = tr.find('input[name="amount"]').val(),
@@ -207,7 +191,7 @@ function detailUpdate(tr) {
         error_ct += 1
     }
 
-    if(id=='0' && amount=='0'){
+    if(amount==='0'){
         trError(tr, '持仓金额不能为0');
         error_ct += 1
     }
@@ -216,7 +200,7 @@ function detailUpdate(tr) {
         error_ct += 1
     }
 
-    if (id==0){
+    if (id===0){
         if(!ua_list.includes(ua)) {
             trError(tr, '请选择已有的理财产品，没有的话请先添加');
             error_ct += 1
@@ -225,8 +209,7 @@ function detailUpdate(tr) {
 
     if(error_ct>0){return false}
 
-    submit_btn.html('<i class="fa fa-spinner fa-pulse"></>');  {# 把保存按钮改成loading图标 #}
-    submit_btn.attr('disabled', 'disabled');  {# 禁用保存按钮 #}
+    disableBtn(submit_btn);{# 禁用保存按钮 #}
 
     $.ajax({
         url: '{{ url_for('user.holdings_details_update') }}',
@@ -234,8 +217,8 @@ function detailUpdate(tr) {
         dataType: 'json',
         data: {'id': id, 'ua': ua, 'name': name, 'amount': amount, 'expiration': expiration},
         success: function (r) {
-            if(r['code']==0){
-                if (id==0){
+            if(r['code']===0){
+                if (id===0){
                     resetNewTbody();
                     $('#dataTbody').prepend('' +
                         '<tr data-id="'+ r['id'] +  '" data-name="' + r['name'] + '" data-amount="'+ r['amount'] +'" data-expiration="'+ r['expiration'] + '">' +
@@ -251,10 +234,8 @@ function detailUpdate(tr) {
                         '    <button type="button" class="btn btn-sm btn-danger tr-delete"><i class="fas fa-trash"></i></button>' +
                         '</td>' +
                         '</tr>');
-                    $('#dataTbody').find('.tr-' + r['id']).addClass('tr-success');
-                    setInterval(function () {
-                        $('#dataTbody').find('.tr-' + r['id']).removeClass('tr-success')
-                    }, 1000);
+                    let new_tr = $('#dataTbody').find('.tr-' + r['id'])
+                    trSuccess(new_tr)
                     return true
                 }
                 else{
@@ -265,18 +246,14 @@ function detailUpdate(tr) {
                     tr.find('.td-name').text(r['name']);
                     tr.find('.td-amount').text(r['amount']);
                     tr.find('.td-expiration').text(r['expiration']);
-                    update_btn.removeClass('d-none');
-                    cancel_btn.addClass('d-none');
-                    submit_btn.addClass('d-none');  {# 隐藏保存按钮 #}
-                    delete_ntm.removeClass('d-none');
-                    submit_btn.html('<i class="fa fa-check"></i>');
-                    submit_btn.removeAttr('disabled');
+                    hideBtns([cancel_btn,submit_btn]);
+                    showBtns([update_btn,delete_ntm]);
+                    resumeBtn(submit_btn,'s');{# 恢复保存按钮 #}
                 }
             }
             else{
                 trError(tr, r['msg']);
-                submit_btn.html('<i class="fa fa-check"></i>');{# 恢复保存按钮 #}
-                submit_btn.removeAttr('disabled');
+                resumeBtn(submit_btn,'s');{# 恢复保存按钮 #}
             }
         }
     })

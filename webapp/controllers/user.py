@@ -132,7 +132,7 @@ def holdings_details():
     ]
     if form.get('agent'):
         query_options.append(UserAsset.agent_id == form.get('agent'))
-    details = UADetail.query.join(UserAsset).filter(*query_options).all()
+    details = UADetail.query.join(UserAsset).filter(*query_options).order_by(UADetail.expiration.asc(), UADetail.id.desc()).all()
     return render_template(
         'user/holdings_details.html',
         details=details,
@@ -164,6 +164,7 @@ def holdings_details_update():
     amount = float(form.get('amount')) * 100
     expiration = form.get('expiration')
     expiration = str2dt(expiration)
+    whatever = form.get('whatever')  # 预留
 
     if detail_id == '0':
         ua_name = form.get('ua')
@@ -179,6 +180,10 @@ def holdings_details_update():
         detail.name = name
         detail.amount = amount
         detail.expiration = expiration
+        if whatever:
+            meta = detail.meta.copy()
+            meta.update({'whatever': whatever})
+            detail.meta = meta
         db.session.commit()
         fp_name = ''
         agent_name = ''

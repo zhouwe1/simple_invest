@@ -4,16 +4,11 @@ $(function () {
 
     $('.tr-clone').click(function () {
         let clone_tr = $('#dataTbody .clone-tr');
-
         if (clone_tr.length > 0){
             clone_tr.addClass('tr-error');
-            setTimeout(function(){
-                clone_tr.removeClass('tr-error')
-            }, 100)
+            setTimeout(function(){clone_tr.removeClass('tr-error')},100)
         }
-        else{
-            $('#dataTbody').prepend($('#cloneTbody > tr').clone())
-        }
+        else{$('#dataTbody').prepend($('#cloneTbody > tr').clone())}
     });
 
     $('.tr-add').click(function () {
@@ -24,9 +19,7 @@ $(function () {
         }
         else{
             newTbody.children('tr').addClass('tr-error');
-            setTimeout(function(){
-                newTbody.children('tr').removeClass('tr-error')
-            }, 100);
+            setTimeout(function(){newTbody.children('tr').removeClass('tr-error')}, 100);
             newTbody.find('input:first').focus()
         }
     });
@@ -35,9 +28,7 @@ $(function () {
         let todo_mode = $('#dataTbody').attr('data-todo');
         if(todo_mode=='on'){
             swalSuccess('已退出Todo模式，请等待页面刷新');
-            setTimeout(function(){
-                location.reload()
-            }, 1000);
+            setTimeout(function(){location.reload()},1000);
         }
         else{
             let today = moment().format("YYYY-MM-DD");
@@ -50,13 +41,10 @@ $(function () {
                     tr = $(this);
                 if(moment(tr_date).isAfter(today)){
                     tr.addClass('tr-success');
-                    setInterval(function () {
-                        tr.remove()
-                    }, 1000);
+                    trRemove(tr)
                 }
             })
         }
-
     });
 
     $('.dashboard-pie-view-detail').click(function () {
@@ -207,17 +195,38 @@ function swalInfo(msg) {Toast.fire({type: 'info', title: msg})}
 function swalSuccess(msg) {Toast.fire({type: 'success', title: msg})}
 
 
-function trError(tr, msg){
+function trError(tr, msg=''){
     tr.addClass('tr-error');
-    setInterval(function () {
-        tr.removeClass('tr-error');
-    }, 1000);
-    swalError(msg);
+    setInterval(function (){tr.removeClass('tr-error')}, 1000);
+    if (msg){swalError(msg)}
 }
 
 function trSuccess(tr){
     tr.addClass('tr-success');
-    setInterval(function () {
-        tr.removeClass('tr-success')
-    }, 1000);
+    setInterval(function (){tr.removeClass('tr-success')}, 1000);
 }
+
+function trRemove(tr){setInterval(function(){tr.remove()},1000);}
+
+function disableBtn(btn){
+    btn.html('<i class="fa fa-spinner fa-pulse"></>');  // 把按钮改成loading图标
+    btn.attr('disabled', 'disabled');  // 禁用按钮
+}
+
+function resumeBtn(btn, action='submit'){
+     // 把按钮从loading图标恢复成原有样式
+    btn.removeAttr('disabled');
+    if (action==='submit'||action==='s'){btn.html('<i class="fa fa-check"></i>')}
+    else if(action==='update'||action==='u'){btn.html('<i class="fas fa-pencil-alt"></i>')}
+    else if(action==='delete'||action==='d'){btn.html('<i class="fas fa-trash"></i>')}
+    else if(action==='cancel'||action==='c'){btn.html('<i class="fa fa-undo"></i>')}
+}
+
+
+function getSubmitBtn(tr){return tr.find('.tr-submit')}
+function getUpdateBtn(tr){return tr.find('.tr-update')}
+function getCancelBtn(tr){return tr.find('.tr-cancel')}
+function getDeleteBtn(tr){return tr.find('.tr-delete')}
+
+function hideBtns(buttons){for(let index in buttons){buttons[index].addClass('d-none')}}
+function showBtns(buttons){for(let index in buttons){buttons[index].removeClass('d-none')}}

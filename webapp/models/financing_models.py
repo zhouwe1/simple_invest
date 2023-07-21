@@ -77,7 +77,7 @@ class UADetail(db.Model):
         self.name = name
         self.expiration = expiration
         self.amount = amount
-        self.meta = meta
+        self.meta = meta or {}
         self.update_time = _now()
         db.session.add(self)
         db.session.commit()
