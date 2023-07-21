@@ -195,7 +195,7 @@ function uaUpdate(tr) {
         data: {'id': id, 'fp': fp, 'agent': agent, 'amount': amount},
         success: function (r) {
             if(r['code']===0){
-                if (id===0){
+                if (id==='0'){
                     resetNewTbody();
                     $('#dataTbody').prepend('' +
                         '<tr data-id="'+ r['id'] +'" data-amount="'+ r['amount'] +'" data-update_time="'+ r['update_time'] +'" class="tr-'+ r['id'] +'">' +

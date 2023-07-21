@@ -200,7 +200,7 @@ function detailUpdate(tr) {
         error_ct += 1
     }
 
-    if (id===0){
+    if (id==='0'){
         if(!ua_list.includes(ua)) {
             trError(tr, '请选择已有的理财产品，没有的话请先添加');
             error_ct += 1
@@ -218,7 +218,7 @@ function detailUpdate(tr) {
         data: {'id': id, 'ua': ua, 'name': name, 'amount': amount, 'expiration': expiration},
         success: function (r) {
             if(r['code']===0){
-                if (id===0){
+                if (id==='0'){
                     resetNewTbody();
                     $('#dataTbody').prepend('' +
                         '<tr data-id="'+ r['id'] +  '" data-name="' + r['name'] + '" data-amount="'+ r['amount'] +'" data-expiration="'+ r['expiration'] + '">' +
