@@ -1,10 +1,12 @@
 from flask import Blueprint, render_template, request, jsonify
 from flask_login import current_user, login_required
 from sqlalchemy.sql import desc
+from werkzeug.exceptions import BadRequest
 from webapp.models.user_models import Family
-from webapp.models.financing_models import Agent, FinancialProduct, UserAsset, UAAmount, FPType
+from webapp.models.financing_models import Agent, FinancialProduct, UserAsset, UAAmount, UADetail, FPType
 from webapp.extentions import db
 from webapp.functions.logs import logger
+from webapp.functions.public import str2dt
 import traceback
 
 
@@ -15,6 +17,7 @@ user_blueprint = Blueprint(
 
 
 @user_blueprint.route('/holdings')
+@login_required
 def holdings():
     form = request.args
     query_dict = {'user_id': current_user.id, 'is_delete': False}
@@ -37,7 +40,8 @@ def holdings():
     )
 
 
-@user_blueprint.route('/holdings_update', methods=['POST'])
+@user_blueprint.route('/holdings/update', methods=['POST'])
+@login_required
 def holdings_update():
     form = request.form
     user = current_user
@@ -46,11 +50,11 @@ def holdings_update():
 
     if ua_id == '0':
         # 走新增接口进来的，添加新的持仓记录，或者恢复已删除的记录
-        agent_id = form.get('agent')
+        agent_id = form.get('agent', type=int)
         fp_name = form.get('fp')
 
-        agent = Agent.query.filter_by(id=agent_id).first()
-        if not agent:
+        agent_name = Agent.name_cache().get(agent_id)
+        if not agent_name:
             return jsonify({'code': 1, 'msg': '购买渠道错误'})
         fp = FinancialProduct.query.filter_by(name=fp_name).first()
         if not fp:
@@ -60,7 +64,7 @@ def holdings_update():
 
         if ua and not ua.is_delete:
             # 存在相同理财产品，相同渠道，未删除的记录
-            return jsonify({'code': 1, 'msg': '已在{}购买过{}，不要重复添加'.format(agent.name, fp.name)})
+            return jsonify({'code': 1, 'msg': '已在{}购买过{}，不要重复添加'.format(agent_name, fp.name)})
         elif ua:
             # 存在相同理财产品，相同渠道，已删除的记录，恢复这条记录
             uaa = UAAmount.update(ua.id, amount)
@@ -110,6 +114,84 @@ def holdings_update():
             logger.error('update user_asset error: {}'.format(traceback.format_exc()))
             db.session.rollback()
             return jsonify({'code': 1, 'msg': '系统错误'})
+
+
+@user_blueprint.route('/holdings/details')
+@login_required
+def holdings_details():
+    """用户理财产品明细"""
+    form = request.args
+    query_dict = {'user_id': current_user.id}
+
+    if form.get('agent'):
+        query_dict['agent_id'] = form.get('agent')
+
+    query_options = [
+        UserAsset.user_id == current_user.id,
+        UserAsset.id == UADetail.userasset_id
+    ]
+    if form.get('agent'):
+        query_options.append(UserAsset.agent_id == form.get('agent'))
+    details = UADetail.query.join(UserAsset).filter(*query_options).all()
+    return render_template(
+        'user/holdings_details.html',
+        details=details,
+        uas=UserAsset.query.filter_by(user_id=current_user.id, is_delete=False).all(),
+        user_agents=Agent.user_agent(current_user.id),
+        fp_types=FPType.dict(),
+    )
+
+
+@user_blueprint.route('/holdings/details', methods=['DELETE'])
+@login_required
+def holdings_details_delete():
+    form = request.form
+    user = current_user
+    detail_id = form.get('id')
+    detail = UADetail.get(detail_id, user.id)
+    db.session.delete(detail)
+    db.session.commit()
+    return jsonify({'code': 0})
+
+
+@user_blueprint.route('/holdings/details/update', methods=['POST'])
+@login_required
+def holdings_details_update():
+    form = request.form
+    user = current_user
+    detail_id = form.get('id')
+    name = form.get('name', '')
+    amount = float(form.get('amount')) * 100
+    expiration = form.get('expiration')
+    expiration = str2dt(expiration)
+
+    if detail_id == '0':
+        ua_name = form.get('ua')
+        agent, ua_name = ua_name.split(':')
+        ua = UserAsset.query.join(FinancialProduct).filter(FinancialProduct.name==ua_name, FinancialProduct.id==UserAsset.fp, UserAsset.user_id==user.id).first()
+        if not ua:
+            raise BadRequest('理财产品错误')
+        detail = UADetail(ua.id, name, expiration, amount)
+        fp_name = ua.fp_name
+        agent_name = ua.agent_name
+    else:
+        detail = UADetail.get(detail_id, user.id)
+        detail.name = name
+        detail.amount = amount
+        detail.expiration = expiration
+        db.session.commit()
+        fp_name = ''
+        agent_name = ''
+
+    return jsonify({
+        'code': 0,
+        'id': detail.id,
+        'agent_name': agent_name,
+        'fp_name': fp_name,
+        'name': detail.name,
+        'amount': str(detail.amount_yuan),
+        'expiration': detail.expiration.strftime('%Y-%m-%d'),
+    })
 
 
 @user_blueprint.route('/family', methods=['POST', 'GET'])

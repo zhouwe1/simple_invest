@@ -1,6 +1,7 @@
 from datetime import datetime
 import pytz
 from hashlib import md5
+from datetime import datetime
 
 TIMEZONE = pytz.timezone('Asia/Shanghai')
 
@@ -17,3 +18,9 @@ def cravatar_hash(email):
 
 def now():
     return datetime.now(tz=TIMEZONE)
+
+
+def str2dt(dt_str):
+    dt_str = dt_str.replace('/', '-')
+    if len(dt_str) == 10:
+        return datetime.strptime(dt_str, '%Y-%m-%d')

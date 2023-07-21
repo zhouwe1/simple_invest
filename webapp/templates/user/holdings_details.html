@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block content_header %}
+{#    理财产品明细#}
+{% endblock %}
+
+{% block content %}
+
+<div class="card">
+    <div class="card-header border-0">
+        <div class="float-left form form-inline">
+            <div class="form-group">
+                <select class="form-control" id="agent_filter" onchange="aFilter()">
+                    <option value="">按渠道</option>
+                    {% for agent_id, agent_name in user_agents.items() %}
+                    <option value="{{ agent_id }}" {% if request.args.agent == agent_id|string %}selected{% endif %}>{{ agent_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="card-tools">
+            <button type="button" class="btn btn-success btn-md tr-add">Add</button>
+        </div>
+    </div>
+    <div class="card-body table-responsive p-0">
+        <table class="table table-valign-middle table-editable">
+            <thead>
+            <tr>
+                <th style="width:15%">渠道</th>
+                <th style="width:23%">理财产品</th>
+                <th style="width:19%">别名</th>
+                <th style="width:15%">持有金额</th>
+                <th style="width:15%">到期时间</th>
+                <th style="width:13%">操作</th>
+            </tr>
+            </thead>
+            <tbody id="newTbody" class="d-none">
+                <tr data-id="0" data-name="" data-type="" data-code="">
+                    <td></td>
+                    <td class="td-fp">
+                        <input type="text" name="new_ua" class="form-control" placeholder="模糊查询" autocomplete="off">
+                    </td>
+                    <td>
+                        <input type="text" name="name" class="form-control" placeholder="区分不同批次的别名" autocomplete="off">
+                    </td>
+                    <td>
+                        <input type="number" name="amount" class="form-control" step="any" min="-99999" max="9999999" autocomplete="off">
+                    </td>
+                    <td><input type="date" name="expiration" class="form-control" autocomplete="off"></td>
+                    <td>
+                        <button type="button" class="btn btn-sm btn-warning tr-cancel"><i class="fa fa-undo"></i></button>
+                        <button type="button" class="btn btn-sm btn-success tr-submit"><i class="fa fa-check"></i></button>
+                    </td>
+
+                </tr>
+            </tbody>
+            <tbody id="dataTbody" data-todo="off">
+            {% for detail in details %}
+                <tr data-id="{{ detail.id }}" data-name="{{ detail.name| default('', True) }}" data-amount="{{ detail.amount_yuan }}" data-expiration="{{ detail.expiration }}">
+                    <td>{{ detail.user_asset.agent.name }}</td>
+                    <td>{{ detail.user_asset.financial_product.name }}</td>
+                    <td class="td-name">{{ detail.name| default('', True) }}</td>
+                    <td class="td-amount">{{ detail.amount_yuan }}</td>
+                    <td class="td-expiration">{{ detail.expiration }}</td>
+                    <td></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block footer_script %}
+<script type="text/javascript">
+let ua_list = [{% for ua in uas %}'{{ ua.agent.name }}:{{ ua.financial_product.name }}',{% endfor %}];
+$(function () {
+    let table = $('.table-editable');
+
+    $('#dataTbody tr').each(function(){
+        $(this).children('td:last').html(
+            '<button type="button" class="btn btn-sm btn-info tr-update"><i class="fas fa-pencil-alt"></i></button> ' +
+            '<button type="button" class="btn btn-sm btn-warning tr-cancel d-none"><i class="fa fa-undo"></i></button> ' +
+            '<button type="button" class="btn btn-sm btn-success tr-submit d-none"><i class="fa fa-check"></i></button> ' +
+            '<button type="button" class="btn btn-sm btn-danger tr-delete"><i class="fas fa-trash"></i></button>'
+        )
+    })
+
+    table.on('click', '.tr-submit', function () {
+        let tr = $(this).parents('tr');
+        detailUpdate(tr)
+    });
+
+    table.on('click', '.tr-update', function(){
+        let tr = $(this).parents('tr'),
+            current_name = tr.attr('data-name'),
+            current_amount = tr.attr('data-amount'),
+            current_expiration = tr.attr('data-expiration');
+
+        tr.find('.tr-update').addClass('d-none');
+        tr.find('.tr-submit').removeClass('d-none');
+        tr.find('.tr-cancel').removeClass('d-none');
+        tr.find('.tr-delete').addClass('d-none');
+
+        tr.find('.td-name').html('<input type="text" name="name" class="form-control" value="'+ current_name +'" placeholder="区分不同批次的别名" autocomplete="off">');
+        tr.find('.td-amount').html('<input type="number" value="'+ current_amount +'"' +
+            ' name="amount" class="form-control" step="any" min="-99999" max="9999999"' +
+            ' onfocus="this.select();"' +
+            ' onmouseup="event.preventDefault()" autocomplete="off">');
+
+        tr.find('.td-expiration').html('<input type="date" name="expiration" value="'+ current_expiration +'" class="form-control" autocomplete="off">')
+
+    });
+
+    table.on('click', '.tr-cancel', function(){
+        let tr = $(this).parents('tr'),
+            id=tr.attr('data-id'),
+            name=tr.attr('data-name'),
+            amount = tr.attr('data-amount'),
+            expiration = tr.attr('data-expiration');
+
+        if(id=='0'){
+            resetNewTbody();
+            return false
+        }
+        tr.find('.td-name').text(name);
+        tr.find('.td-amount').text(amount);
+        tr.find('.td-expiration').text(expiration);
+
+        tr.find('.tr-update').removeClass('d-none');
+        tr.find('.tr-submit').addClass('d-none');
+        tr.find('.tr-cancel').addClass('d-none');
+        tr.find('.tr-delete').removeClass('d-none');
+    });
+
+    table.on('click', '.tr-delete', function () {
+        let tr =$(this).parents('tr'),
+            id = tr.attr('data-id');
+        if(tr.hasClass('clone-tr')){tr.remove()}
+        else{
+            tr.addClass('tr-danger');
+            bootbox.confirm('确认删除吗？', function (result) {
+                if(result){
+                    tr.find('.tr-delete').attr('disabled', 'disabled');
+                    tr.find('.tr-delete').html('<i class="fa fa-spinner fa-pulse"></>');
+
+                    $.ajax({
+                        url: '{{ url_for('user.holdings_details_delete') }}',
+                        type: 'DELETE',
+                        dataType: 'json',
+                        data: {'id': id},
+                        success: function (r) {
+                            if(r['code']==0){
+                                setInterval(function () {
+                                tr.remove();
+                                }, 500);
+                            }
+                            else{
+                                swalError(r['msg']);
+                                tr.removeClass('tr-danger');
+                                tr.addClass('tr-error');
+                                setInterval(function () {
+                                    tr.removeClass('tr-error');
+                                }, 500);
+                                tr.find('.tr-delete').html('<i class="fas fa-trash"></i>');
+                                tr.find('.tr-delete').removeAttr('disabled');
+                            }
+                        }
+                    })
+
+                }
+                else{
+                    tr.removeClass('tr-danger');
+                }
+            })
+        }
+    })
+
+    $('input[name="new_ua"]').autocomplete({
+        lookup: ua_list,
+        autoSelectFirst: true
+    });
+});
+
+function resetNewTbody() {
+    let tbody = $('#newTbody');
+    tbody.addClass('d-none');  {# 隐藏newTbody #}
+    tbody.find('input').each(function () {$(this).val('')});
+}
+
+function detailUpdate(tr) {
+    let error_ct = 0,
+        id = tr.attr('data-id'),
+        submit_btn = tr.find('.tr-submit'),
+        update_btn = tr.find('.tr-update'),
+        cancel_btn = tr.find('.tr-cancel'),
+        delete_ntm = tr.find('.tr-delete'),
+        ua = tr.find('input[name="new_ua"]').val(),
+        name = tr.find('input[name="name"]').val(),
+        amount = tr.find('input[name="amount"]').val(),
+        expiration = tr.find('input[name="expiration"]').val();
+
+    if (!expiration){
+        trError(tr, '请选择到期日期');
+        error_ct += 1
+    }
+
+    if(id=='0' && amount=='0'){
+        trError(tr, '持仓金额不能为0');
+        error_ct += 1
+    }
+    if(!amount){
+        trError(tr, '请输入持有金额');
+        error_ct += 1
+    }
+
+    if (id==0){
+        if(!ua_list.includes(ua)) {
+            trError(tr, '请选择已有的理财产品，没有的话请先添加');
+            error_ct += 1
+        }
+    }
+
+    if(error_ct>0){return false}
+
+    submit_btn.html('<i class="fa fa-spinner fa-pulse"></>');  {# 把保存按钮改成loading图标 #}
+    submit_btn.attr('disabled', 'disabled');  {# 禁用保存按钮 #}
+
+    $.ajax({
+        url: '{{ url_for('user.holdings_details_update') }}',
+        type: 'POST',
+        dataType: 'json',
+        data: {'id': id, 'ua': ua, 'name': name, 'amount': amount, 'expiration': expiration},
+        success: function (r) {
+            if(r['code']==0){
+                if (id==0){
+                    resetNewTbody();
+                    $('#dataTbody').prepend('' +
+                        '<tr data-id="'+ r['id'] +  '" data-name="' + r['name'] + '" data-amount="'+ r['amount'] +'" data-expiration="'+ r['expiration'] + '">' +
+                        '<td>'+ r['agent_name'] + '</td>' +
+                        '<td>'+ r['fp_name'] + '</td>' +
+                        '<td class="td-name">' + r['name'] + '</td>' +
+                        '<td class="td-amount">'+ r['amount'] +'</td>' +
+                        '<td class="td-expiration">'+ r['expiration'] +'</td>' +
+                        '<td>' +
+                        '    <button type="button" class="btn btn-sm btn-info tr-update"><i class="fas fa-pencil-alt"></i></button>' +
+                        '    <button type="button" class="btn btn-sm btn-warning tr-cancel d-none"><i class="fa fa-undo"></i></button>' +
+                        '    <button type="button" class="btn btn-sm btn-success tr-submit d-none"><i class="fa fa-check"></i></button>' +
+                        '    <button type="button" class="btn btn-sm btn-danger tr-delete"><i class="fas fa-trash"></i></button>' +
+                        '</td>' +
+                        '</tr>');
+                    $('#dataTbody').find('.tr-' + r['id']).addClass('tr-success');
+                    setInterval(function () {
+                        $('#dataTbody').find('.tr-' + r['id']).removeClass('tr-success')
+                    }, 1000);
+                    return true
+                }
+                else{
+                    trSuccess(tr);
+                    tr.attr('data-name', r['name']);
+                    tr.attr('data-amount', r['amount']);
+                    tr.attr('data-expiration', r['expiration']);
+                    tr.find('.td-name').text(r['name']);
+                    tr.find('.td-amount').text(r['amount']);
+                    tr.find('.td-expiration').text(r['expiration']);
+                    update_btn.removeClass('d-none');
+                    cancel_btn.addClass('d-none');
+                    submit_btn.addClass('d-none');  {# 隐藏保存按钮 #}
+                    delete_ntm.removeClass('d-none');
+                    submit_btn.html('<i class="fa fa-check"></i>');
+                    submit_btn.removeAttr('disabled');
+                }
+            }
+            else{
+                trError(tr, r['msg']);
+                submit_btn.html('<i class="fa fa-check"></i>');{# 恢复保存按钮 #}
+                submit_btn.removeAttr('disabled');
+            }
+        }
+    })
+}
+
+function tFilter() {
+    let type_id = $('#type_filter').val();
+    window.location.href = '?fp_type=' + type_id
+}
+
+function aFilter() {
+    let type_id = $('#agent_filter').val();
+    window.location.href = '?agent=' + type_id
+}
+</script>
+{% endblock %}

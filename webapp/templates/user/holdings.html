@@ -237,10 +237,7 @@ function uaUpdate(tr) {
                             tr.remove();
                         }, 1000);
                     }
-                    tr.addClass('tr-success');
-                    setInterval(function () {
-                        tr.removeClass('tr-success')
-                    }, 1000);
+                    trSuccess(tr)
                     tr.attr('data-amount', r['amount']);
                     tr.attr('data-update_time', r['update_time']);
                     tr.find('.td-amount').text(r['amount']);

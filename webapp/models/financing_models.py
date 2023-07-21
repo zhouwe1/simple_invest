@@ -1,4 +1,6 @@
+from werkzeug.exceptions import BadRequest
 from sqlalchemy import UniqueConstraint, desc
+from sqlalchemy.dialects.sqlite import JSON
 from webapp.extentions import db, cache
 from webapp.functions.public import now as _now
 
@@ -17,6 +19,11 @@ class UserAsset(db.Model):
 
     amounts = db.relationship(
         'UAAmount',
+        backref='user_asset',
+        lazy='dynamic'
+    )
+    details = db.relationship(
+        'UADetail',
         backref='user_asset',
         lazy='dynamic'
     )
@@ -53,6 +60,38 @@ class UserAsset(db.Model):
         if operation == 'insert':
             # 新增持仓记录时，刷新用户的渠道缓存
             cache.delete('agent_user_{}'.format(model.user_id))
+
+
+class UADetail(db.Model):
+    """用户理财产品明细"""
+    id = db.Column(db.Integer(), primary_key=True)
+    userasset_id = db.Column(db.Integer(), db.ForeignKey('user_asset.id', ondelete='RESTRICT'), nullable=False)
+    name = db.Column(db.String(32))
+    expiration = db.Column(db.Date(), index=True)
+    amount = db.Column(db.Integer(), default=0)
+    update_time = db.Column(db.DateTime(timezone=True))
+    meta = db.Column(JSON, default={})
+
+    def __init__(self, userasset_id, name, expiration, amount, meta: dict = None):
+        self.userasset_id = userasset_id
+        self.name = name
+        self.expiration = expiration
+        self.amount = amount
+        self.meta = meta
+        self.update_time = _now()
+        db.session.add(self)
+        db.session.commit()
+
+    @property
+    def amount_yuan(self):
+        return round(self.amount / 100, 2)
+
+    @classmethod
+    def get(cls, detail_id, user_id):
+        detail = cls.query.filter_by(id=detail_id).first()
+        if not detail or detail.user_asset.user_id != user_id:
+            raise BadRequest('理财产品错误')
+        return detail
 
 
 class UAAmount(db.Model):

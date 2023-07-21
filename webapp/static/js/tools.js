@@ -205,3 +205,19 @@ function fill_trend_ua_chart(labels, datas) {
 function swalError(msg) {Toast.fire({type: 'error', title: msg})}
 function swalInfo(msg) {Toast.fire({type: 'info', title: msg})}
 function swalSuccess(msg) {Toast.fire({type: 'success', title: msg})}
+
+
+function trError(tr, msg){
+    tr.addClass('tr-error');
+    setInterval(function () {
+        tr.removeClass('tr-error');
+    }, 1000);
+    swalError(msg);
+}
+
+function trSuccess(tr){
+    tr.addClass('tr-success');
+    setInterval(function () {
+        tr.removeClass('tr-success')
+    }, 1000);
+}

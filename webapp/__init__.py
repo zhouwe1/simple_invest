@@ -1,6 +1,7 @@
-from flask import Flask, session
+from flask import Flask, session, jsonify
 from flask_login import current_user
-from flask_sqlalchemy import models_committed
+from werkzeug.exceptions import HTTPException
+from flask_sqlalchemy.track_modifications import models_committed
 from .extentions import db, alembic, login_manager
 from .config import Config
 from .models import *
@@ -36,3 +37,9 @@ def update_cache(sender, changes):
             model.clear_cache(model, operation)
     except AttributeError:
         pass
+
+
+@flask_app.errorhandler(HTTPException)
+def handle_exp(error):
+    if isinstance(error, BadRequest):
+        return jsonify({'code': 1, 'msg': error.description})
