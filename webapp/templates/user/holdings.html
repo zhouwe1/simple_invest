@@ -87,8 +87,8 @@
 {% block footer_script %}
 <script type="text/javascript">
 let fp_list = [{% for fp in fps %}'{{ fp.name }}',{% endfor %}];
-$(function () {
-    let table = $('.table-editable');
+$(function(){
+    let table=$('.table-editable');
 
     $('#dataTbody tr').each(function(){
         $(this).children('td:last').html(update_btn_t_html+cancel_btn_f_html+submit_btn_f_html)
@@ -103,14 +103,12 @@ $(function () {
         if(event.keyCode===13){$(this).parents('tr').find('.tr-submit').click()}
     });
 
-    table.on('click', '.tr-update', function(){
+    table.on('click','.tr-update',function(){
         let tr=$(this).parents('tr'),
             current_amount=tr.attr('data-amount');
-
         tr.find('.tr-update').addClass('d-none');
         tr.find('.tr-submit').removeClass('d-none');
         tr.find('.tr-cancel').removeClass('d-none');
-
         tr.find('.td-amount').html('<input type="number" value="'+current_amount+'" name="amount" class="form-control" step="any" min="-99999" max="9999999" onfocus="this.select();" onmouseup="event.preventDefault()" autocomplete="off">');
         tr.find('input:first').focus();
     });
@@ -150,10 +148,10 @@ function uaUpdate(tr){
         todo_mode=$('#dataTbody').attr('data-todo');
 
     if(id==='0'){
-        if(!fp_list.includes(fp)){trError(tr, '请选择已有的理财产品，没有的话请先添加');error_ct+=1}
+        if(!fp_list.includes(fp)){trError(tr,'请选择已有的理财产品，没有的话请先添加');error_ct+=1}
         if(!agent){trError(tr,'请选择购买渠道');error_ct+=1}
     }
-    if(amount==='0'){trError(tr, '持仓金额不能为0');error_ct+=1}
+    if(amount==='0'){trError(tr,'持仓金额不能为0');error_ct+=1}
     if(!amount){trError(tr,'请输入持有金额');error_ct+=1}
     if(error_ct>0){return false}
     disableBtn(submit_btn);{# 禁用保存按钮 #}
@@ -167,7 +165,7 @@ function uaUpdate(tr){
             if(r['code']===0){
                 if(id==='0'){
                     resetNewTbody();
-                    $('#dataTbody').prepend('' +
+                    $('#dataTbody').prepend(''+
                         '<tr data-id="'+r['id']+'" data-amount="'+r['amount']+'" data-update_time="'+r['update_time']+'" class="tr-'+r['id']+'">' +
                         '<td>'+r['agent']+'</td>'+
                         '<td>'+r['name']+'</td>'+
@@ -180,29 +178,18 @@ function uaUpdate(tr){
                     return true
                 }
                 else{
-                    if(todo_mode==='on'){
-                        tr.addClass('tr-success');
-                        trRemove(tr);
-                        return true
-                    }
-                    if(r['is_delete']){
-                        tr.addClass('tr-danger');
-                        trRemove(tr);
-                    }
+                    if(todo_mode==='on'){tr.addClass('tr-success');trRemove(tr);return true}
+                    if(r['is_delete']){tr.addClass('tr-danger');trRemove(tr)}
                     trSuccess(tr);
                     tr.attr('data-amount',r['amount']);
                     tr.attr('data-update_time',r['update_time']);
                     tr.find('.td-amount').text(r['amount']);
                     tr.find('.td-update_time').text(r['update_time']);
-                    showBtns([update_btn])
-                    hideBtns([cancel_btn,submit_btn])
+                    showBtns([update_btn]);
+                    hideBtns([cancel_btn,submit_btn]);
                     resumeBtn(submit_btn,'s');{# 恢复保存按钮 #}
                 }
-            }
-            else{
-                trError(tr,r['msg']);
-                resumeBtn(submit_btn,'s');{# 恢复保存按钮 #}
-            }
+            }else{trError(tr,r['msg']);resumeBtn(submit_btn,'s')}
         }
     })
 }

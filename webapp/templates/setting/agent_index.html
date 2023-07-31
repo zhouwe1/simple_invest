@@ -49,21 +49,21 @@
 
 {% block footer_script %}
 <script type="text/javascript">
-$(function () {
-    let dataTbody = $('#dataTbody');
+$(function(){
+    let dataTbody=$('#dataTbody');
 
     $('#dataTbody tr').each(function(){
         $(this).children('td:last').html(update_btn_t_html+submit_btn_f_html+delete_btn_t_html+cancel_btn_f_html)
     });
 
-    dataTbody.on('click', '.tr-update', function () {
+    dataTbody.on('click','.tr-update',function(){
         let tr=$(this).parents('tr'),
             name_td=tr.find('.td-name'),
             name=tr.attr('data-name');
-        $(this).addClass('d-none');  //隐藏修改按钮
-        tr.find('.tr-delete').addClass('d-none');  //隐藏删除按钮
-        tr.find('.tr-cancel').removeClass('d-none');  //显示保存按钮
-        tr.find('.tr-submit').removeClass('d-none');  //显示保存按钮
+        $(this).addClass('d-none');{#隐藏修改按钮#}
+        tr.find('.tr-delete').addClass('d-none');{#隐藏删除按钮#}
+        tr.find('.tr-cancel').removeClass('d-none');{#显示保存按钮#}
+        tr.find('.tr-submit').removeClass('d-none');{#显示保存按钮#}
         name_td.html('<input type="text" name="name" maxlength="16" class="form-control" value="'+name+'" placeholder="请输入名称" autocomplete="off">')
     });
 
@@ -82,14 +82,14 @@ $(function () {
         tr.find('.tr-delete').removeClass('d-none');
     });
 
-    dataTbody.on('click', '.tr-delete', function () {
+    dataTbody.on('click','.tr-delete',function(){
         let tr =$(this).parents('tr'),
             id=tr.attr('data-id'),
             delete_btn=getBtn(tr,'delete');
         if(tr.hasClass('clone-tr')){tr.remove()}
         else{
             tr.addClass('tr-danger');
-            bootbox.confirm('确认删除吗？', function (c) {
+            bootbox.confirm('确认删除吗？',function(c){
                 if(c){
                     disableBtn(delete_btn);
                     $.ajax({
@@ -99,11 +99,7 @@ $(function () {
                         data:{'id':id},
                         success:function(r){
                             if(r['code']===0){trRemove(tr)}
-                            else{
-                                tr.removeClass('tr-danger');
-                                trError(tr, r['msg']);
-                                resumeBtn(delete_btn,'d')
-                            }
+                            else{tr.removeClass('tr-danger');trError(tr, r['msg']);resumeBtn(delete_btn,'d')}
                         }
                     })
                 }else{tr.removeClass('tr-danger')}
@@ -112,8 +108,7 @@ $(function () {
     })
 });
 
-
-function agentUpdate(tr) {
+function agentUpdate(tr){
     let [submit_btn,update_btn,cancel_btn,delete_btn]=getBtns(tr),
         id=tr.attr('data-id'),
         name_input=tr.find('input[name="name"]'),
@@ -144,15 +139,9 @@ function agentUpdate(tr) {
                 resumeBtn(submit_btn,'s');
                 showBtns([delete_btn,update_btn]);
                 hideBtns([cancel_btn,submit_btn]);
-            }
-            else{
-                trError(tr,r['msg']);
-                name_input.val(old_name);
-                resumeBtn(submit_btn,'s')
-            }
+            }else{trError(tr,r['msg']);name_input.val(old_name);resumeBtn(submit_btn,'s')}
         }
     })
-
 }
 </script>
 {% endblock %}

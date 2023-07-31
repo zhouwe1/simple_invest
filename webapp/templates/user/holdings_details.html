@@ -76,17 +76,14 @@
 {% block footer_script %}
 <script type="text/javascript">
 let ua_list = [{% for ua in uas %}'{{ ua.agent.name }}:{{ ua.financial_product.name }}',{% endfor %}];
-$(function () {
-    let table = $('.table-editable');
+$(function(){
+    let table=$('.table-editable');
 
     $('#dataTbody tr').each(function(){
         $(this).children('td:last').html(update_btn_t_html+cancel_btn_f_html+submit_btn_f_html+delete_btn_t_html)
     })
 
-    table.on('click','.tr-submit',function(){
-        let tr=$(this).parents('tr');
-        detailUpdate(tr)
-    });
+    table.on('click','.tr-submit',function(){let tr=$(this).parents('tr');detailUpdate(tr)});
 
     table.on('click','.tr-update',function(){
         let tr=$(this).parents('tr'),
@@ -160,23 +157,22 @@ function detailUpdate(tr) {
         name=tr.find('input[name="name"]').val(),
         amount=tr.find('input[name="amount"]').val(),
         expiration=tr.find('input[name="expiration"]').val();
-
     if(!expiration){trError(tr,'请选择到期日期');error_ct+=1}
     if(amount==='0'){trError(tr,'持仓金额不能为0');error_ct+=1}
     if(!amount){trError(tr,'请输入持有金额');error_ct+=1}
     if (id==='0'){
-        if(!ua_list.includes(ua)){trError(tr, '请选择已有的理财产品，没有的话请先添加');error_ct+=1}
+        if(!ua_list.includes(ua)){trError(tr,'请选择已有的理财产品，没有的话请先添加');error_ct+=1}
     }
     if(error_ct>0){return false}
 
     disableBtn(submit_btn);{# 禁用保存按钮 #}
 
     $.ajax({
-        url: '{{ url_for('user.holdings_details_update') }}',
-        type: 'POST',
-        dataType: 'json',
-        data: {'id':id,'ua':ua,'name':name,'amount':amount,'expiration':expiration},
-        success: function (r) {
+        url:'{{ url_for('user.holdings_details_update') }}',
+        type:'POST',
+        dataType:'json',
+        data:{'id':id,'ua':ua,'name':name,'amount':amount,'expiration':expiration},
+        success:function(r){
             if(r['code']===0){
                 if(id==='0'){
                     resetNewTbody();
@@ -204,10 +200,9 @@ function detailUpdate(tr) {
                     showBtns([update_btn,delete_btn]);
                     resumeBtn(submit_btn,'s');{# 恢复保存按钮 #}
                 }
-            }else{trError(tr, r['msg']);resumeBtn(submit_btn,'s')}
+            }else{trError(tr,r['msg']);resumeBtn(submit_btn,'s')}
         }
     })
 }
-
 </script>
 {% endblock %}
