@@ -10,7 +10,7 @@
     <div class="card-header border-0">
         <div class="float-left form form-inline">
             <div class="form-group">
-                <select class="form-control" id="type_filter" onchange="tFilter()">
+                <select class="form-control" id="type_filter" onchange="typeFilter()">
                     <option value="">按分类</option>
                     {% for fpt_id, fpt_name in fp_types.items() %}
                     <option value="{{ fpt_id }}" {% if request.args.fp_type == fpt_id|string %}selected{% endif %}>{{ fpt_name }}</option>
@@ -18,7 +18,7 @@
                 </select>
             </div>&nbsp;
             <div class="form-group">
-                <select class="form-control" id="agent_filter" onchange="aFilter()">
+                <select class="form-control" id="agent_filter" onchange="agentFilter()">
                     <option value="">按渠道</option>
                     {% for agent_id, agent_name in user_agents.items() %}
                     <option value="{{ agent_id }}" {% if request.args.agent == agent_id|string %}selected{% endif %}>{{ agent_name }}</option>
@@ -52,7 +52,7 @@
                               {% endfor %}
                          </select>
                     </td>
-                    <td class="td-fp">
+                    <td>
                         <input type="text" name="new_fp" class="form-control" placeholder="模糊查询" autocomplete="off">
                     </td>
                     <td>
@@ -91,49 +91,36 @@ $(function () {
     let table = $('.table-editable');
 
     $('#dataTbody tr').each(function(){
-        $(this).children('td:last').html(
-            '<button type="button" class="btn btn-info tr-update"><i class="fas fa-pencil-alt"></i></button> ' +
-            '<button type="button" class="btn btn-warning tr-cancel d-none"><i class="fa fa-undo"></i></button> ' +
-            '<button type="button" class="btn btn-success tr-submit d-none"><i class="fa fa-check"></i></button>'
-        )
-    })
+        $(this).children('td:last').html(update_btn_t_html+cancel_btn_f_html+submit_btn_f_html)
+    });
 
-    table.on('click', '.tr-submit', function () {
-        let tr = $(this).parents('tr');
+    table.on('click','.tr-submit',function(){
+        let tr=$(this).parents('tr');
         uaUpdate(tr)
     });
 
-    $('#dataTbody').on('keyup', 'input[name="amount"]', function () {
-        if(event.keyCode===13){
-            $(this).parents('tr').find('.tr-submit').click()
-        }
+    $('#dataTbody').on('keyup','input[name="amount"]',function(){
+        if(event.keyCode===13){$(this).parents('tr').find('.tr-submit').click()}
     });
 
     table.on('click', '.tr-update', function(){
-        let tr = $(this).parents('tr'),
-            current_amount = tr.attr('data-amount');
+        let tr=$(this).parents('tr'),
+            current_amount=tr.attr('data-amount');
 
         tr.find('.tr-update').addClass('d-none');
         tr.find('.tr-submit').removeClass('d-none');
         tr.find('.tr-cancel').removeClass('d-none');
 
-        tr.find('.td-amount').html('<input type="number" value="'+ current_amount +'"' +
-            ' name="amount" class="form-control" step="any" min="-99999" max="9999999"' +
-            ' onfocus="this.select();"' +
-            ' onmouseup="event.preventDefault()" autocomplete="off">');
-
+        tr.find('.td-amount').html('<input type="number" value="'+current_amount+'" name="amount" class="form-control" step="any" min="-99999" max="9999999" onfocus="this.select();" onmouseup="event.preventDefault()" autocomplete="off">');
         tr.find('input:first').focus();
     });
 
-    table.on('click', '.tr-cancel', function(){
-        let tr = $(this).parents('tr'),
+    table.on('click','.tr-cancel',function(){
+        let tr=$(this).parents('tr'),
             id=tr.attr('data-id'),
-            amount = tr.attr('data-amount'),
-            amount_td = tr.find('.td-amount');
-        if(id==='0'){
-            resetNewTbody();
-            return false
-        }
+            amount=tr.attr('data-amount'),
+            amount_td=tr.find('.td-amount');
+        if(id==='0'){resetNewTbody();return false}
 
         amount_td.text(amount);
         tr.find('.tr-update').removeClass('d-none');
@@ -141,75 +128,54 @@ $(function () {
         tr.find('.tr-cancel').addClass('d-none');
     });
 
-    $('input[name="new_fp"]').autocomplete({
-        lookup: fp_list,
-        autoSelectFirst: true
-    });
+    $('input[name="new_fp"]').autocomplete({lookup:fp_list,autoSelectFirst:true});
 });
 
-function resetNewTbody() {
-    let tbody = $('#newTbody'),
-        submit_btn = tbody.find('.tr-submit');
-    tbody.addClass('d-none');  {# 隐藏newTbody #}
-    tbody.find('input').each(function () {$(this).val('')});
+function resetNewTbody(){
+    let tbody=$('#newTbody'),
+        submit_btn=tbody.find('.tr-submit');
+    tbody.addClass('d-none');{# 隐藏newTbody #}
+    tbody.find('input').each(function(){$(this).val('')});
     tbody.find('select').val('');
-    resumeBtn(submit_btn,'s');  {#恢复提交按钮样式#}
+    resumeBtn(submit_btn,'s');{#恢复提交按钮样式#}
 }
 
-function uaUpdate(tr) {
-    let error_ct = 0,
-        id = tr.attr('data-id'),
-        submit_btn=getSubmitBtn(tr),
-        update_btn=getUpdateBtn(tr),
-        cancel_btn=getCancelBtn(tr),
-        fp = tr.find('input[name="new_fp"]').val(),
-        agent = tr.find('select[name="new_agent"]').val(),
-        amount = tr.find('input[name="amount"]').val(),
-        todo_mode = $('#dataTbody').attr('data-todo');
+function uaUpdate(tr){
+    let error_ct=0,
+        id=tr.attr('data-id'),
+        [submit_btn,update_btn,cancel_btn,_]=getBtns(tr),
+        fp=tr.find('input[name="new_fp"]').val(),
+        agent=tr.find('select[name="new_agent"]').val(),
+        amount=tr.find('input[name="amount"]').val(),
+        todo_mode=$('#dataTbody').attr('data-todo');
 
     if(id==='0'){
-        if (!fp_list.includes(fp)) {
-            trError(tr, '请选择已有的理财产品，没有的话请先添加');
-            error_ct += 1
-        }
-        if(!agent){
-            trError(tr, '请选择购买渠道');
-            error_ct += 1
-        }
+        if(!fp_list.includes(fp)){trError(tr, '请选择已有的理财产品，没有的话请先添加');error_ct+=1}
+        if(!agent){trError(tr,'请选择购买渠道');error_ct+=1}
     }
-    if(amount==='0'){
-        trError(tr, '持仓金额不能为0');
-        error_ct += 1
-    }
-    if(!amount){
-        trError(tr, '请输入持有金额');
-        error_ct += 1
-    }
+    if(amount==='0'){trError(tr, '持仓金额不能为0');error_ct+=1}
+    if(!amount){trError(tr,'请输入持有金额');error_ct+=1}
     if(error_ct>0){return false}
     disableBtn(submit_btn);{# 禁用保存按钮 #}
 
     $.ajax({
-        url: '{{ url_for('user.holdings_update') }}',
-        type: 'POST',
-        dataType: 'json',
-        data: {'id': id, 'fp': fp, 'agent': agent, 'amount': amount},
-        success: function (r) {
+        url:'{{ url_for('user.holdings_update') }}',
+        type:'POST',
+        dataType:'json',
+        data:{'id':id,'fp':fp,'agent':agent,'amount':amount},
+        success:function(r){
             if(r['code']===0){
-                if (id==='0'){
+                if(id==='0'){
                     resetNewTbody();
                     $('#dataTbody').prepend('' +
-                        '<tr data-id="'+ r['id'] +'" data-amount="'+ r['amount'] +'" data-update_time="'+ r['update_time'] +'" class="tr-'+ r['id'] +'">' +
-                        '<td>'+ r['agent'] + '</td>' +
-                        '<td>'+ r['name'] + '</td>' +
-                        '<td class="td-amount">'+ r['amount'] +'</td>' +
-                        '<td class="td-update_time">'+ r['update_time'] +'</td>' +
-                        '<td>' +
-                        '    <button type="button" class="btn btn-info tr-update"><i class="fas fa-pencil-alt"></i></button>' +
-                        '    <button type="button" class="btn btn-warning tr-cancel d-none"><i class="fa fa-undo"></i></button>' +
-                        '    <button type="button" class="btn btn-success tr-submit d-none"><i class="fa fa-check"></i></button>' +
-                        '</td>' +
+                        '<tr data-id="'+r['id']+'" data-amount="'+r['amount']+'" data-update_time="'+r['update_time']+'" class="tr-'+r['id']+'">' +
+                        '<td>'+r['agent']+'</td>'+
+                        '<td>'+r['name']+'</td>'+
+                        '<td class="td-amount">'+r['amount']+'</td>'+
+                        '<td class="td-update_time">'+r['update_time']+'</td>'+
+                        '<td>'+update_btn_t_html+cancel_btn_f_html+submit_btn_f_html+'</td>'+
                         '</tr>');
-                    let new_tr=$('#dataTbody').find('.tr-' + r['id']);
+                    let new_tr=$('#dataTbody').find('.tr-'+r['id']);
                     trSuccess(new_tr)
                     return true
                 }
@@ -224,8 +190,8 @@ function uaUpdate(tr) {
                         trRemove(tr);
                     }
                     trSuccess(tr);
-                    tr.attr('data-amount', r['amount']);
-                    tr.attr('data-update_time', r['update_time']);
+                    tr.attr('data-amount',r['amount']);
+                    tr.attr('data-update_time',r['update_time']);
                     tr.find('.td-amount').text(r['amount']);
                     tr.find('.td-update_time').text(r['update_time']);
                     showBtns([update_btn])
@@ -234,21 +200,11 @@ function uaUpdate(tr) {
                 }
             }
             else{
-                trError(tr, r['msg']);
+                trError(tr,r['msg']);
                 resumeBtn(submit_btn,'s');{# 恢复保存按钮 #}
             }
         }
     })
-}
-
-function tFilter() {
-    let type_id = $('#type_filter').val();
-    window.location.href = '?fp_type=' + type_id
-}
-
-function aFilter() {
-    let type_id = $('#agent_filter').val();
-    window.location.href = '?agent=' + type_id
 }
 </script>
 {% endblock %}

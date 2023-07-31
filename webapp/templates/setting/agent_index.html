@@ -24,12 +24,7 @@
             {% for agent in agents %}
                 <tr data-id="{{ agent.id }}" data-name="{{ agent.name }}">
                     <td class="td-name">{{ agent.name }}</td>
-                    <td>
-                        <button type="button" class="btn btn-info tr-update"><i class="fas fa-pencil-alt"></i></button>
-                        <button type="button" class="btn btn-success tr-submit d-none"><i class="fa fa-check"></i></button>
-                        <button type="button" class="btn btn-danger tr-delete"><i class="fas fa-trash"></i></button>
-                        <button type="button" class="btn btn-warning tr-cancel d-none"><i class="fa fa-undo"></i></button>
-                    </td>
+                    <td></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -57,6 +52,10 @@
 $(function () {
     let dataTbody = $('#dataTbody');
 
+    $('#dataTbody tr').each(function(){
+        $(this).children('td:last').html(update_btn_t_html+submit_btn_f_html+delete_btn_t_html+cancel_btn_f_html)
+    });
+
     dataTbody.on('click', '.tr-update', function () {
         let tr=$(this).parents('tr'),
             name_td=tr.find('.td-name'),
@@ -65,16 +64,15 @@ $(function () {
         tr.find('.tr-delete').addClass('d-none');  //隐藏删除按钮
         tr.find('.tr-cancel').removeClass('d-none');  //显示保存按钮
         tr.find('.tr-submit').removeClass('d-none');  //显示保存按钮
-        name_td.html('<input type="text" name="name" maxlength="16" class="form-control"' +
-            ' value="' + name + '" placeholder="请输入名称" autocomplete="off">')
+        name_td.html('<input type="text" name="name" maxlength="16" class="form-control" value="'+name+'" placeholder="请输入名称" autocomplete="off">')
     });
 
-    dataTbody.on('click', '.tr-submit', function () {
-        let tr = $(this).parents('tr');
+    dataTbody.on('click','.tr-submit',function(){
+        let tr=$(this).parents('tr');
         agentUpdate(tr)
     });
 
-    dataTbody.on('click', '.tr-cancel', function () {
+    dataTbody.on('click','.tr-cancel',function(){
         let tr =$(this).parents('tr'),
             name = tr.attr('data-name');
         tr.children('.td-name').text(name);
@@ -87,12 +85,12 @@ $(function () {
     dataTbody.on('click', '.tr-delete', function () {
         let tr =$(this).parents('tr'),
             id=tr.attr('data-id'),
-            delete_btn=getDeleteBtn(tr);
+            delete_btn=getBtn(tr,'delete');
         if(tr.hasClass('clone-tr')){tr.remove()}
         else{
             tr.addClass('tr-danger');
-            bootbox.confirm('确认删除吗？', function (result) {
-                if(result){
+            bootbox.confirm('确认删除吗？', function (c) {
+                if(c){
                     disableBtn(delete_btn);
                     $.ajax({
                         url:'{{ url_for('setting.agent_delete') }}',
@@ -116,14 +114,11 @@ $(function () {
 
 
 function agentUpdate(tr) {
-    let submit_btn=getSubmitBtn(tr),
-        update_btn=getUpdateBtn(tr),
-        cancel_btn=getCancelBtn(tr),
-        delete_btn=getDeleteBtn(tr),
-        id = tr.attr('data-id'),
-        name_input = tr.find('input[name="name"]'),
-        old_name = tr.attr('data-name'),
-        new_name = name_input.val();
+    let [submit_btn,update_btn,cancel_btn,delete_btn]=getBtns(tr),
+        id=tr.attr('data-id'),
+        name_input=tr.find('input[name="name"]'),
+        old_name=tr.attr('data-name'),
+        new_name=name_input.val();
     if(!new_name){return false}
     if(new_name===old_name){
         hideBtns([submit_btn,cancel_btn]);
@@ -137,18 +132,18 @@ function agentUpdate(tr) {
         url:'{{ url_for('setting.agent_update') }}',
         type:'POST',
         dataType:'json',
-        data:{'id': id, 'name': new_name},
+        data:{'id':id,'name':new_name},
         success:function(r) {
             if(r['code']===0){
                 trSuccess(tr);
-                tr.attr('data-id', r['id']);
-                tr.attr('data-name', r['name']);
+                tr.attr('data-id',r['id']);
+                tr.attr('data-name',r['name']);
                 tr.children('.td-name').text(r['name']);
                 tr.removeClass('clone-tr');
-                resumeBtn(update_btn, 'u');
-                resumeBtn(submit_btn, 's');
-                showBtns([delete_btn, update_btn]);
-                hideBtns([cancel_btn, submit_btn]);
+                resumeBtn(update_btn,'u');
+                resumeBtn(submit_btn,'s');
+                showBtns([delete_btn,update_btn]);
+                hideBtns([cancel_btn,submit_btn]);
             }
             else{
                 trError(tr,r['msg']);

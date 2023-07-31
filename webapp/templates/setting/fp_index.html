@@ -11,7 +11,7 @@
         <h3 class="card-title"></h3>
 
         <div class="form-inline float-left">
-            <select class="form-control" id="type_filter" onchange="tFilter()">
+            <select class="form-control" id="type_filter" onchange="typeFilter()">
                 <option value="">按分类查看</option>
                 {% for fpt_id, fpt_name in fp_types.items() %}
                 <option value="{{ fpt_id }}" {% if request.args.type == fpt_id|string %}selected{% endif %}>{{ fpt_name }}</option>
@@ -38,12 +38,7 @@
                     <td class="td-name">{{ fp.name }}</td>
                     <td class="td-type">{{ fp.type.name }}</td>
                     <td class="td-code">{{ fp.code|default('', True) }}</td>
-                    <td>
-                        <button type="button" class="btn btn-info tr-update"><i class="fas fa-pencil-alt"></i></button>
-                        <button type="button" class="btn btn-success tr-submit d-none"><i class="fa fa-check"></i></button>
-                        <button type="button" class="btn btn-danger tr-delete"><i class="fas fa-trash"></i></button>
-                        <button type="button" class="btn btn-warning tr-cancel d-none"><i class="fa fa-undo"></i></button>
-                    </td>
+                    <td></td>
                 </tr>
             {% endfor %}
             </tbody>
@@ -84,24 +79,27 @@ $(function () {
     let dataTbody = $('#dataTbody');
     let type_html = '<select class="form-control" name="type">{% for fpt_id, fpt_name in fp_types.items() %}<option value="{{ fpt_id }}">{{ fpt_name }}</option>{% endfor %}</select>';
 
-    dataTbody.on('click', '.tr-submit', function () {
-        let tr = $(this).parents('tr');
+    $('#dataTbody tr').each(function(){
+        $(this).children('td:last').html(update_btn_t_html+submit_btn_f_html+delete_btn_t_html+cancel_btn_f_html)
+    });
+
+    dataTbody.on('click','.tr-submit',function(){
+        let tr=$(this).parents('tr');
         fpUpdate(tr)
     });
 
-    dataTbody.on('click', '.tr-update', function(){
-        let tr = $(this).parents('tr'),
-            name_td = tr.find('.td-name'),
-            type_td = tr.find('.td-type'),
-            code_td = tr.find('.td-code'),
-            name = tr.attr('data-name'),
-            type_id = tr.attr('data-type-id'),
-            code = tr.attr('data-code');
-        name_td.html('<input type="text" name="name" maxlength="32" class="form-control"' +
-            ' value="' + name + '" placeholder="请输入名称" autocomplete="off">');
+    dataTbody.on('click','.tr-update',function(){
+        let tr=$(this).parents('tr'),
+            name_td=tr.find('.td-name'),
+            type_td=tr.find('.td-type'),
+            code_td=tr.find('.td-code'),
+            name=tr.attr('data-name'),
+            type_id=tr.attr('data-type-id'),
+            code=tr.attr('data-code');
+        name_td.html('<input type="text" name="name" maxlength="32" class="form-control" value="'+name+'" placeholder="请输入名称" autocomplete="off">');
         type_td.html(type_html);
         type_td.find('select').val(type_id);
-        code_td.html('<input type="text" name="code" class="form-control" value="' + code + '" maxlength="6" minlength="6" placeholder="基金/股票" autocomplete="off">');
+        code_td.html('<input type="text" name="code" class="form-control" value="'+code+'" maxlength="6" minlength="6" placeholder="基金/股票" autocomplete="off">');
         tr.find('.tr-update').addClass('d-none');
         tr.find('.tr-submit').removeClass('d-none');
         tr.find('.tr-delete').addClass('d-none');
@@ -125,15 +123,15 @@ $(function () {
         tr.find('.tr-cancel').addClass('d-none');
     });
 
-    dataTbody.on('click', '.tr-delete', function () {
+    dataTbody.on('click','.tr-delete',function(){
         let tr=$(this).parents('tr'),
             id=tr.attr('data-id'),
-            delete_btn=getDeleteBtn(tr);
+            delete_btn=getBtn(tr,'delete');
         if(tr.hasClass('clone-tr')){tr.remove()}
         else{
             tr.addClass('tr-danger');
-            bootbox.confirm('确认删除吗？', function (result) {
-                if(result){
+            bootbox.confirm('确认删除吗？', function (c) {
+                if(c){
                     disableBtn(delete_btn);
                     $.ajax({
                         url: '{{ url_for('setting.fp_delete') }}',
@@ -160,10 +158,7 @@ function fpUpdate(tr) {
     // 理财产品添加或修改
     let code_types=new Array([3, 4, 5, 9]),
         id = tr.attr('data-id'),
-        submit_btn = getSubmitBtn(tr),
-        update_btn = getUpdateBtn(tr),
-        cancel_btn = getCancelBtn(tr),
-        delete_btn = getDeleteBtn(tr),
+        [submit_btn, update_btn,cancel_btn,delete_btn]=getBtns(tr),
         name_input = tr.find('input[name="name"]'),
         code_input = tr.find('input[name="code"]'),
         old_name = tr.attr('data-name'),
@@ -216,11 +211,5 @@ function fpUpdate(tr) {
         }
     })
 }
-
-function tFilter() {
-    let type_id = $('#type_filter').val();
-    window.location.href = '?type=' + type_id
-}
-
 </script>
 {% endblock %}
