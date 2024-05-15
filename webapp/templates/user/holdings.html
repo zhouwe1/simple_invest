@@ -132,10 +132,10 @@ $(function(){
 function resetNewTbody(){
     let tbody=$('#newTbody'),
         submit_btn=tbody.find('.tr-submit');
-    tbody.addClass('d-none');{# 隐藏newTbody #}
+    tbody.addClass('d-none'); // 隐藏newTbody
     tbody.find('input').each(function(){$(this).val('')});
     tbody.find('select').val('');
-    resumeBtn(submit_btn,'s');{#恢复提交按钮样式#}
+    resumeBtn(submit_btn,'s'); // 恢复提交按钮样式
 }
 
 function uaUpdate(tr){
@@ -151,13 +151,12 @@ function uaUpdate(tr){
         if(!fp_list.includes(fp)){trError(tr,'请选择已有的理财产品，没有的话请先添加');error_ct+=1}
         if(!agent){trError(tr,'请选择购买渠道');error_ct+=1}
     }
-    if(amount==='0'){trError(tr,'持仓金额不能为0');error_ct+=1}
     if(!amount){trError(tr,'请输入持有金额');error_ct+=1}
     if(error_ct>0){return false}
-    disableBtn(submit_btn);{# 禁用保存按钮 #}
+    disableBtn(submit_btn); // 禁用保存按钮
 
     $.ajax({
-        url:'{{ url_for('user.holdings_update') }}',
+        url:'{{ url_for("user.holdings_update") }}',
         type:'POST',
         dataType:'json',
         data:{'id':id,'fp':fp,'agent':agent,'amount':amount},
@@ -187,7 +186,7 @@ function uaUpdate(tr){
                     tr.find('.td-update_time').text(r['update_time']);
                     showBtns([update_btn]);
                     hideBtns([cancel_btn,submit_btn]);
-                    resumeBtn(submit_btn,'s');{# 恢复保存按钮 #}
+                    resumeBtn(submit_btn,'s'); // 恢复保存按钮
                 }
             }else{trError(tr,r['msg']);resumeBtn(submit_btn,'s')}
         }
