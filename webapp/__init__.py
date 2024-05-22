@@ -42,4 +42,6 @@ def update_cache(sender, changes):
 @flask_app.errorhandler(HTTPException)
 def handle_exp(error):
     if isinstance(error, BadRequest):
-        return jsonify({'code': 1, 'msg': error.description})
+        return jsonify({'code': 1, 'msg': error.description}), error.code
+    else:
+        return ''

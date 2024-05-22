@@ -5,7 +5,7 @@ DB_FILE = BASE_DIR / 'webapp/financing.db'
 
 
 class Config:
-    DEBUG = True
+    DEBUG = False
     SECRET_KEY = 'S02sS*SJ:#BSH@5sb2#=_23 ^s5<$.>2(#@'
 
     # 数据库
